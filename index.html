@@ -1,31 +1,318 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My C++ Site</title>
   <style>
-    body { font-family: sans-serif; background:#111; color:#eee; text-align:center; padding-top:50px; }
-    button { padding: 10px 20px; font-size: 16px; }
-    #result { margin-top: 20px; font-size: 20px; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px 40px;
+    }
+    h1 { color: #e94560; margin-bottom: 8px; }
+    button {
+      background: #e94560;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    #result { margin-top: 20px; font-size: 1.4rem; }
+    #console-output {
+      margin-top: 20px;
+      background: #0f3460;
+      padding: 12px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      font-family: monospace;
+      min-height: 40px;
+    }
+
+    /* ── Game of Life section ── */
+    .gol-section {
+      margin-top: 48px;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .gol-section h2 { color: #e94560; margin-bottom: 4px; font-size: 1.4rem; }
+    .gol-section p  { color: #aaa; font-size: 0.85rem; margin: 0 0 14px; text-align: center; }
+
+    #gol-canvas {
+      display: block;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 10px;
+      border: 2px solid #0f3460;
+      background: #0a0a1a;
+      touch-action: none;
+    }
+
+    .gol-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      justify-content: center;
+      width: 100%;
+    }
+    .gol-controls button {
+      margin: 0;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      flex: 1 1 100px;
+      max-width: 160px;
+    }
+    .gol-controls button.secondary {
+      background: #0f3460;
+    }
+    .gol-controls button.secondary:hover { background: #1a4a80; }
+    .gol-controls button:hover { background: #c73652; }
+
+    .gol-stats {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #777;
+      letter-spacing: 0.04em;
+    }
   </style>
 </head>
 <body>
-  <h1>Hello from C++ (WebAssembly)</h1>
-  <p>2 + 3 computed by compiled C++ code:</p>
-  <button onclick="runAdd()">Run add(2,3)</button>
+  <h1>Hello from C++ &#x1F9E0;</h1>
+  <p>This page is powered by C++ compiled to WebAssembly.</p>
+  <button onclick="runAdd()">Run C++: add(3, 4)</button>
   <div id="result"></div>
+  <div id="console-output">Console output will appear here...</div>
 
-  <script src="main.js"></script>
+  <!-- ── Game of Life ── -->
+  <section class="gol-section">
+    <h2>Conway's Game of Life</h2>
+    <p>Tap/click cells to draw &nbsp;·&nbsp; Drag to paint &nbsp;·&nbsp; Watch patterns emerge</p>
+    <canvas id="gol-canvas"></canvas>
+    <div class="gol-controls">
+      <button id="btn-playpause">⏸ Pause</button>
+      <button id="btn-step"     class="secondary">⏭ Step</button>
+      <button id="btn-random"   class="secondary">🎲 Random</button>
+      <button id="btn-clear"    class="secondary">🗑 Clear</button>
+      <button id="btn-glider"   class="secondary">🛸 Glider</button>
+    </div>
+    <div class="gol-stats" id="gol-stats">Gen: 0 &nbsp;·&nbsp; Alive: 0</div>
+  </section>
+
   <script>
+    /* ─── C++ wasm shim ─── */
     var Module = {
-      onRuntimeInitialized: function() {
-        window.runAdd = function() {
-          const result = Module.ccall('add', 'number', ['number','number'], [2,3]);
-          document.getElementById('result').innerText = "Result: " + result;
-        };
+      print: function(text) {
+        document.getElementById("console-output").innerText = text;
       }
     };
+  </script>
+  <script src="main.js"></script>
+  <script>
+    function runAdd() {
+      var res = Module.ccall("add", "number", ["number", "number"], [3, 4]);
+      document.getElementById("result").innerText = "3 + 4 = " + res;
+    }
+  </script>
+
+  <!-- ── Game of Life engine ── -->
+  <script>
+  (function () {
+    const canvas  = document.getElementById("gol-canvas");
+    const ctx     = canvas.getContext("2d");
+    const stats   = document.getElementById("gol-stats");
+
+    const CELL    = 14;   // logical cell size (px on a 1x display)
+    let cols, rows, grid, next;
+    let running   = true;
+    let gen       = 0;
+    let lastTick  = 0;
+    const FPS     = 12;   // ticks per second
+    const TICK_MS = 1000 / FPS;
+
+    /* ── sizing ── */
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const w   = canvas.parentElement.clientWidth;
+      const h   = Math.min(Math.floor(w * 0.56), window.innerHeight * 0.55);
+      canvas.width  = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.height = h + "px";
+      ctx.scale(dpr, dpr);
+      cols = Math.floor(w   / CELL);
+      rows = Math.floor(h   / CELL);
+      initGrid();
+      randomize();
+    }
+
+    function initGrid() {
+      grid = new Uint8Array(cols * rows);
+      next = new Uint8Array(cols * rows);
+    }
+
+    const idx = (c, r) => r * cols + c;
+
+    /* ── seed ── */
+    function randomize() {
+      gen = 0;
+      for (let i = 0; i < grid.length; i++)
+        grid[i] = Math.random() < 0.3 ? 1 : 0;
+    }
+
+    function clearGrid() {
+      gen = 0;
+      grid.fill(0);
+    }
+
+    function spawnGlider(c, r) {
+      const pat = [[1,0],[2,1],[0,2],[1,2],[2,2]];
+      pat.forEach(([dc,dr]) => {
+        const cc = (c + dc) % cols;
+        const rr = (r + dr) % rows;
+        grid[idx(cc, rr)] = 1;
+      });
+    }
+
+    /* ── simulation step ── */
+    function step() {
+      gen++;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let n = 0;
+          for (let dr = -1; dr <= 1; dr++)
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = (r + dr + rows) % rows;
+              const nc = (c + dc + cols) % cols;
+              n += grid[idx(nc, nr)];
+            }
+          const alive = grid[idx(c, r)];
+          next[idx(c, r)] = alive
+            ? (n === 2 || n === 3 ? 1 : 0)
+            : (n === 3 ? 1 : 0);
+        }
+      }
+      [grid, next] = [next, grid];
+    }
+
+    /* ── draw ── */
+    const DEAD_COLOR  = "#0a0a1a";
+    const CELL_COLORS = ["#e94560","#c73652","#ff6b8a","#ff8fa3"];
+
+    function draw() {
+      const w = canvas.width  / (window.devicePixelRatio || 1);
+      const h = canvas.height / (window.devicePixelRatio || 1);
+      ctx.fillStyle = DEAD_COLOR;
+      ctx.fillRect(0, 0, w, h);
+
+      let alive = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (!grid[idx(c, r)]) continue;
+          alive++;
+          ctx.fillStyle = CELL_COLORS[(c ^ r) & 3];
+          ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
+        }
+      }
+      stats.textContent = `Gen: ${gen}  ·  Alive: ${alive}`;
+    }
+
+    /* ── loop ── */
+    function loop(ts) {
+      requestAnimationFrame(loop);
+      if (running && ts - lastTick >= TICK_MS) {
+        step();
+        lastTick = ts;
+      }
+      draw();
+    }
+
+    /* ── painting (mouse + touch) ── */
+    let painting = false;
+    let paintVal = 1;
+
+    function cellAt(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = (canvas.width  / (window.devicePixelRatio || 1)) / rect.width;
+      const scaleY = (canvas.height / (window.devicePixelRatio || 1)) / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top)  * scaleY;
+      return [Math.floor(x / CELL), Math.floor(y / CELL)];
+    }
+
+    function paintAt(e) {
+      const [c, r] = cellAt(e);
+      if (c >= 0 && c < cols && r >= 0 && r < rows)
+        grid[idx(c, r)] = paintVal;
+    }
+
+    canvas.addEventListener("mousedown", e => {
+      painting = true;
+      const [c, r] = cellAt(e);
+      paintVal = (c >= 0 && c < cols && r >= 0 && r < rows)
+        ? (grid[idx(c, r)] ? 0 : 1) : 1;
+      paintAt(e);
+    });
+    canvas.addEventListener("mousemove", e => { if (painting) paintAt(e); });
+    window.addEventListener("mouseup",   () => painting = false);
+
+    canvas.addEventListener("touchstart", e => {
+      e.preventDefault();
+      painting = true;
+      const t = e.touches[0];
+      const [c, r] = cellAt(t);
+      paintVal = (c >= 0 && c < cols && r >= 0 && r < rows)
+        ? (grid[idx(c, r)] ? 0 : 1) : 1;
+      paintAt(t);
+    }, { passive: false });
+    canvas.addEventListener("touchmove", e => {
+      e.preventDefault();
+      if (painting) paintAt(e.touches[0]);
+    }, { passive: false });
+    window.addEventListener("touchend", () => painting = false);
+
+    /* ── controls ── */
+    const btnPP = document.getElementById("btn-playpause");
+    btnPP.addEventListener("click", () => {
+      running = !running;
+      btnPP.textContent = running ? "⏸ Pause" : "▶ Play";
+    });
+    document.getElementById("btn-step").addEventListener("click", () => {
+      running = false;
+      btnPP.textContent = "▶ Play";
+      step();
+    });
+    document.getElementById("btn-random").addEventListener("click", () => {
+      randomize();
+    });
+    document.getElementById("btn-clear").addEventListener("click", () => {
+      clearGrid();
+    });
+    document.getElementById("btn-glider").addEventListener("click", () => {
+      spawnGlider(Math.floor(cols / 2), Math.floor(rows / 2));
+    });
+
+    /* ── init ── */
+    window.addEventListener("resize", resize);
+    resize();
+    requestAnimationFrame(loop);
+  })();
   </script>
 </body>
 </html>
