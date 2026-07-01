@@ -1,0 +1,33 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+
+      - name: Compile C++ to WASM
+        run: emcc main.cpp -O2 -o main.js -s WASM=1 -s EXPORTED_FUNCTIONS='["_add","_main"]' -s EXPORTED_RUNTIME_METHODS='["ccall"]'
+
+      - name: Prepare deploy folder
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp main.js dist/
+          cp main.wasm dist/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
