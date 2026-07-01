@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My C++ Site</title>
+  <style>
+    body { font-family: sans-serif; background:#111; color:#eee; text-align:center; padding-top:50px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    #result { margin-top: 20px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Hello from C++ (WebAssembly)</h1>
+  <p>2 + 3 computed by compiled C++ code:</p>
+  <button onclick="runAdd()">Run add(2,3)</button>
+  <div id="result"></div>
+
+  <script src="main.js"></script>
+  <script>
+    var Module = {
+      onRuntimeInitialized: function() {
+        window.runAdd = function() {
+          const result = Module.ccall('add', 'number', ['number','number'], [2,3]);
+          document.getElementById('result').innerText = "Result: " + result;
+        };
+      }
+    };
+  </script>
+</body>
+</html>
