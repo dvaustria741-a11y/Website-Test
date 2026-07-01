@@ -1,31 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My C++ Site</title>
   <style>
-    body { font-family: sans-serif; background:#111; color:#eee; text-align:center; padding-top:50px; }
-    button { padding: 10px 20px; font-size: 16px; }
-    #result { margin-top: 20px; font-size: 20px; }
+    body { font-family: sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    h1 { color: #e94560; }
+    button { background: #e94560; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 16px; }
+    #result { margin-top: 20px; font-size: 1.4rem; }
+    #console-output { margin-top: 20px; background: #0f3460; padding: 12px; border-radius: 8px; width: 80%; max-width: 400px; font-family: monospace; min-height: 40px; }
   </style>
 </head>
 <body>
-  <h1>Hello from C++ (WebAssembly)</h1>
-  <p>2 + 3 computed by compiled C++ code:</p>
-  <button onclick="runAdd()">Run add(2,3)</button>
+  <h1>Hello from C++ &#x1F9E0;</h1>
+  <p>This page is powered by C++ compiled to WebAssembly.</p>
+  <button onclick="runAdd()">Run C++: add(3, 4)</button>
   <div id="result"></div>
-
-  <script src="main.js"></script>
+  <div id="console-output">Console output will appear here...</div>
   <script>
     var Module = {
-      onRuntimeInitialized: function() {
-        window.runAdd = function() {
-          const result = Module.ccall('add', 'number', ['number','number'], [2,3]);
-          document.getElementById('result').innerText = "Result: " + result;
-        };
+      print: function(text) {
+        document.getElementById("console-output").innerText = text;
       }
     };
+  </script>
+  <script src="main.js"></script>
+  <script>
+    function runAdd() {
+      var res = Module.ccall("add", "number", ["number", "number"], [3, 4]);
+      document.getElementById("result").innerText = "3 + 4 = " + res;
+    }
   </script>
 </body>
 </html>

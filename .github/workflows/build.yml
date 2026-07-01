@@ -1,11 +1,7 @@
 name: Build and Deploy
-
 on:
   push:
     branches: [main]
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -17,7 +13,12 @@ jobs:
         uses: mymindstorm/setup-emsdk@v14
 
       - name: Compile C++ to WASM
-        run: emcc main.cpp -O2 -o main.js -s WASM=1 -s EXPORTED_FUNCTIONS='["_add","_main"]' -s EXPORTED_RUNTIME_METHODS='["ccall"]'
+        run: |
+          emcc main.cpp -o main.js \
+            -s WASM=1 \
+            -s EXPORTED_FUNCTIONS="[\"_add\",\"_main\"]" \
+            -s EXPORTED_RUNTIME_METHODS="[\"ccall\"]" \
+            -s ENVIRONMENT=web
 
       - name: Prepare deploy folder
         run: |
