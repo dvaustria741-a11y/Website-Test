@@ -7,184 +7,272 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#000;color:#00ff41;font-family:'Share Tech Mono','Courier New',monospace;min-height:100vh;overflow-x:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column}
-
-  #overlay{position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-  #overlay p{font-size:1.1rem;opacity:0.7;animation:blink 1s infinite}
-  #spinner{width:60px;height:60px;border:4px solid #00ff4133;border-top-color:#00ff41;border-radius:50%;animation:spin 0.8s linear infinite}
-
+  body{background:#000;color:#00ff41;font-family:'Share Tech Mono','Courier New',monospace;min-height:100vh;overflow-x:hidden;animation:flicker 5s infinite}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:100}
+  @keyframes flicker{0%,100%{opacity:1}93%{opacity:.85}94%{opacity:1}96%{opacity:.9}97%{opacity:1}}
+  #screen{max-width:860px;margin:0 auto;padding:24px 20px 60px}
+  .header{border:1px solid #00ff41;padding:12px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 12px #00ff4155,inset 0 0 12px #00ff4110}
+  .header-title{font-size:.75rem;letter-spacing:.15em;opacity:.7}
+  .header-id{font-size:.7rem;color:#00cc33}
+  #clock{font-size:.75rem;opacity:.6}
+  .log-line{font-size:.82rem;line-height:1.8;white-space:pre-wrap;word-break:break-all}
+  .log-line.dim{color:#007a20}.log-line.warn{color:#ffe600}.log-line.bright{color:#afffca;font-weight:bold}.log-line.red{color:#ff3c3c}
+  .progress-bar{display:flex;align-items:center;gap:10px;margin:4px 0;font-size:.82rem}
+  .bar-track{width:220px;height:10px;border:1px solid #00ff41;background:#001a07;position:relative;overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,#004d15,#00ff41);width:0%;transition:width .05s linear;box-shadow:2px 0 8px #00ff41}
+  .bar-pct{min-width:38px;font-size:.78rem}
+  .result-box{border:1px solid #00ff41;padding:18px 22px;margin-top:22px;box-shadow:0 0 24px #00ff4144,inset 0 0 18px #00ff4108;display:none}
+  .result-box.show{display:block}
+  .result-title{font-size:.68rem;letter-spacing:.2em;color:#007a20;margin-bottom:14px;border-bottom:1px solid #003d10;padding-bottom:8px}
+  .field{display:grid;grid-template-columns:180px 1fr;gap:4px 12px;margin-bottom:8px;font-size:.82rem;align-items:start}
+  .field-key{color:#007a20;text-align:right}.field-val{color:#afffca}
+  @keyframes textglow{0%{color:#fff;text-shadow:0 0 16px #00ff41}100%{color:#afffca;text-shadow:none}}
+  .glow{animation:textglow 1.4s ease-out forwards}
+  .map-box{margin-top:16px;border:1px solid #003d10;height:160px;background:#000e03;position:relative;overflow:hidden}
+  .map-grid{position:absolute;inset:0;background-image:linear-gradient(#001a0720 1px,transparent 1px),linear-gradient(90deg,#001a0720 1px,transparent 1px);background-size:28px 28px}
+  .map-ping{position:absolute;width:14px;height:14px;border-radius:50%;background:#00ff41;box-shadow:0 0 20px #00ff41;top:50%;left:50%;transform:translate(-50%,-50%)}
+  .map-ring{position:absolute;border:1px solid #00ff41;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:ping 2s ease-out infinite;opacity:0}
+  .map-ring:nth-child(2){animation-delay:.6s}.map-ring:nth-child(3){animation-delay:1.2s}
+  @keyframes ping{0%{width:14px;height:14px;opacity:.9}100%{width:110px;height:110px;opacity:0}}
+  .map-coords{position:absolute;bottom:6px;right:8px;font-size:.62rem;color:#004d15}
+  .map-label{position:absolute;top:8px;left:10px;font-size:.62rem;color:#004d15}
+  .gmaps-btn{display:inline-block;margin-top:14px;padding:9px 18px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-family:inherit;font-size:.8rem;letter-spacing:.1em;background:transparent;box-shadow:0 0 10px #00ff4133}
+  .cursor{display:inline-block;width:8px;height:14px;background:#00ff41;vertical-align:middle;animation:blink .8s step-end infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  .alert-banner{background:#ff0000;color:#fff;text-align:center;padding:10px;font-size:.9rem;letter-spacing:.12em;margin-top:22px;animation:alertpulse 1s ease-in-out infinite alternate;display:none}
+  .alert-banner.show{display:block}
+  @keyframes alertpulse{from{opacity:1}to{opacity:.55}}
+  #waiting{text-align:center;padding:30px 20px;color:#007a20;font-size:.82rem;display:none;border:1px dashed #003d10;margin-top:12px}
+  #waiting .spinner{font-size:1.8rem;animation:spin 1.2s linear infinite;display:block;margin-bottom:10px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes blink{0%,100%{opacity:0.4}50%{opacity:1}}
-  @keyframes flicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:0.6}94%{opacity:1}96%{opacity:0.7}97%{opacity:1}}
-  @keyframes glitch{0%,100%{transform:translate(0)}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,2px)}}
-  @keyframes scanline{0%{top:-10%}100%{top:110%}}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pulse{0%,100%{box-shadow:0 0 10px #00ff41,0 0 20px #00ff4155}50%{box-shadow:0 0 30px #00ff41,0 0 60px #00ff4188}}
-  @keyframes redpulse{0%,100%{box-shadow:0 0 10px #ff0000,0 0 20px #ff000055}50%{box-shadow:0 0 30px #ff0000,0 0 60px #ff000088}}
-  @keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-8px,0)}20%{transform:translate(8px,0)}30%{transform:translate(-6px,0)}40%{transform:translate(6px,0)}50%{transform:translate(-4px,0)}60%{transform:translate(4px,0)}70%{transform:translate(-2px,0)}80%{transform:translate(2px,0)}90%{transform:translate(-1px,0)}}
-
-  .scanline{position:fixed;width:100%;height:3px;background:linear-gradient(transparent,#00ff4122,transparent);animation:scanline 4s linear infinite;pointer-events:none;z-index:100}
-
-  #main{display:none;width:90%;max-width:700px;padding:20px;animation:fadeIn 0.5s ease}
-
-  .terminal-box{border:1px solid #00ff41;padding:20px;margin:16px 0;animation:pulse 2s infinite;position:relative;overflow:hidden}
-  .terminal-box::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 50%,#00ff4108 50%);background-size:100% 4px;pointer-events:none}
-
-  .terminal-box.red{border-color:#ff0000;color:#ff4444;animation:redpulse 1.5s infinite}
-  .terminal-box.red .label{color:#ff0000}
-
-  .label{color:#00ff41;font-size:0.7rem;opacity:0.7;margin-bottom:6px;letter-spacing:2px}
-  .value{font-size:1.3rem;font-weight:bold;letter-spacing:1px}
-
-  #alert-header{text-align:center;margin-bottom:10px}
-  #alert-header .big{font-size:2rem;animation:glitch 0.3s infinite;color:#ff0000;letter-spacing:4px}
-  #alert-header .sub{font-size:0.85rem;opacity:0.7;margin-top:6px;color:#ffaa00}
-
-  #log{border:1px solid #00ff4144;padding:12px;font-size:0.75rem;max-height:160px;overflow-y:auto;line-height:1.8;opacity:0.8}
-  #log::-webkit-scrollbar{width:4px}
-  #log::-webkit-scrollbar-thumb{background:#00ff41}
-
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:480px){.grid2{grid-template-columns:1fr}}
-
-  #close-btn{display:block;margin:20px auto 0;background:transparent;border:1px solid #00ff4166;color:#00ff41;font-family:inherit;font-size:0.85rem;padding:10px 28px;cursor:pointer;letter-spacing:2px;transition:all 0.2s}
-  #close-btn:hover{background:#00ff4122;border-color:#00ff41}
-
-  .tag{display:inline-block;background:#00ff4122;border:1px solid #00ff4166;padding:2px 8px;font-size:0.7rem;margin-right:6px;border-radius:2px}
 </style>
 </head>
 <body>
-<div class="scanline"></div>
-
-<div id="overlay">
-  <div id="spinner"></div>
-  <p>SCANNING...</p>
-</div>
-
-<div id="main">
-  <div id="alert-header">
-    <div class="big">⚠ LOCATION DETECTED ⚠</div>
-    <div class="sub">Your device has been identified on our network</div>
-  </div>
-
-  <div class="terminal-box red">
-    <div class="label">◈ PRIMARY TARGET</div>
-    <div class="value" id="loc-city">--</div>
-    <div style="font-size:0.8rem;margin-top:6px;opacity:0.8" id="loc-region">Locating...</div>
-  </div>
-
-  <div class="grid2">
-    <div class="terminal-box">
-      <div class="label">◈ IP ADDRESS</div>
-      <div class="value" id="loc-ip">...</div>
+<div id="screen">
+  <div class="header">
+    <div>
+      <div class="header-title">◈ NETWORK INTELLIGENCE SYSTEM v4.2.1</div>
+      <div class="header-id">SESSION: <span id="sessId"></span></div>
     </div>
-    <div class="terminal-box">
-      <div class="label">◈ ISP / ORG</div>
-      <div class="value" style="font-size:0.9rem" id="loc-isp">...</div>
-    </div>
-    <div class="terminal-box">
-      <div class="label">◈ COUNTRY</div>
-      <div class="value" id="loc-country">...</div>
-    </div>
-    <div class="terminal-box">
-      <div class="label">◈ TIMEZONE</div>
-      <div class="value" style="font-size:0.9rem" id="loc-tz">...</div>
-    </div>
+    <div id="clock"></div>
   </div>
 
   <div id="log"></div>
 
-  <button id="close-btn" onclick="endPrank()">[ I KNOW, IT'S A PRANK 😂 ]</button>
+  <div id="waiting">
+    <span class="spinner">◎</span>
+    WAITING FOR LOCATION ACCESS...<br>
+    <span style="font-size:.7rem;opacity:.5;margin-top:6px;display:block">Tap <b>Allow</b> on the popup to continue.</span>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div class="result-title">▸ TARGET PROFILE — ACQUIRED</div>
+    <div class="field"><span class="field-key">IP ADDRESS</span>   <span class="field-val" id="r-ip"></span></div>
+    <div class="field"><span class="field-key">ISP</span>          <span class="field-val" id="r-isp"></span></div>
+    <div class="field"><span class="field-key">DEVICE</span>       <span class="field-val" id="r-device"></span></div>
+    <div class="field"><span class="field-key">OS</span>           <span class="field-val" id="r-os"></span></div>
+    <div class="field"><span class="field-key">BROWSER</span>      <span class="field-val" id="r-browser"></span></div>
+    <div class="field"><span class="field-key">BATTERY</span>      <span class="field-val" id="r-battery"></span></div>
+    <div class="field"><span class="field-key">LATITUDE</span>     <span class="field-val" id="r-lat"></span></div>
+    <div class="field"><span class="field-key">LONGITUDE</span>    <span class="field-val" id="r-lng"></span></div>
+    <div class="field"><span class="field-key">ACCURACY</span>     <span class="field-val" id="r-acc"></span></div>
+    <div class="field"><span class="field-key">ALTITUDE</span>     <span class="field-val" id="r-alt"></span></div>
+
+    <div class="map-box">
+      <div class="map-grid"></div>
+      <div class="map-ring"></div><div class="map-ring"></div><div class="map-ring"></div>
+      <div class="map-ping"></div>
+      <div class="map-label">▸ LIVE POSITION LOCK</div>
+      <div class="map-coords" id="mapCoords"></div>
+    </div>
+    <a class="gmaps-btn" id="gmapsBtn" href="#" target="_blank">▸ OPEN IN GOOGLE MAPS</a>
+  </div>
+
+  <div class="alert-banner" id="alertBanner">
+    ⚠ LOCATION LOCK CONFIRMED — COORDINATES TRANSMITTED ⚠
+  </div>
 </div>
 
-<audio id="snd" preload="auto">
-  <source id="snd-src" type="audio/mpeg">
-</audio>
-
 <script>
+const $=id=>document.getElementById(id);
+const logEl=$('log');
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function hex(n){return[...Array(n)].map(()=>Math.floor(Math.random()*16).toString(16)).join('')}
+function pad(n){return String(n).padStart(2,'0')}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
+function tick(){const d=new Date();$('clock').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} UTC+8`}
+tick();setInterval(tick,1000);
+$('sessId').textContent=(hex(4)+'-'+hex(4)+'-'+hex(4)).toUpperCase();
 
-const log = document.getElementById('log');
-let logLines = [];
-function addLog(msg, color){
-  const d = new Date();
-  const ts = `[${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}]`;
-  logLines.push(`<span style="opacity:0.5">${ts}</span> <span style="color:${color||'#00ff41'}">${msg}</span>`);
-  log.innerHTML = logLines.join('<br>');
-  log.scrollTop = log.scrollHeight;
-}
+const FAKE={
+  ip:`${rnd(100,223)}.${rnd(10,254)}.${rnd(1,254)}.${rnd(1,254)}`,
+  isp:['PLDT Home Fiber','Globe Telecom','Converge ICT','Sky Broadband'][rnd(0,3)],
+  device:['Samsung Galaxy A55','Xiaomi Redmi Note 13','OPPO Reno 10','vivo V30'][rnd(0,3)],
+};
 
-async function init(){
-  await new Promise(r=>setTimeout(r, 2000));
+let queue=[],running=false;
+function addLine(t,cls='',delay=0){queue.push({t,cls,delay});if(!running)flush()}
+function addProgress(label,fillMs=1600){queue.push({type:'p',label,fillMs});if(!running)flush()}
+function waitFor(p){queue.push({type:'wait',p});if(!running)flush()}
 
-  // Play sound
-  const snd = document.getElementById('snd');
-  document.getElementById('snd-src').src = 'data:audio/mpeg;base64,' + MP3_DATA;
-  snd.load();
-  snd.volume = 0.85;
-  snd.play().catch(()=>{});
-
-  // Show main
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('main').style.display = 'block';
-
-  // Shake body
-  document.body.style.animation = 'shake 0.6s ease, flicker 5s infinite';
-  setTimeout(()=>document.body.style.animation='flicker 5s infinite', 700);
-
-  addLog('Connection established...','#ffaa00');
-  addLog('Querying IP geolocation database...','#00ff41');
-  addLog('Bypassing firewall...','#ff4444');
-
-  try {
-    const res = await fetch('https://ipapi.co/json/');
-    const d = await res.json();
-
-    await new Promise(r=>setTimeout(r,400));
-    addLog(`Target IP resolved: ${d.ip}`,'#ff4444');
-    document.getElementById('loc-ip').textContent = d.ip || 'Unknown';
-
-    await new Promise(r=>setTimeout(r,350));
-    addLog(`ISP identified: ${d.org}`,'#ffaa00');
-    document.getElementById('loc-isp').textContent = d.org || 'Unknown';
-
-    await new Promise(r=>setTimeout(r,350));
-    document.getElementById('loc-country').textContent = (d.country_name || 'Unknown') + ' ' + (d.country_code ? `(${d.country_code})` : '');
-    document.getElementById('loc-tz').textContent = d.timezone || 'Unknown';
-
-    await new Promise(r=>setTimeout(r,300));
-    const city = d.city || 'Unknown City';
-    const region = d.region || '';
-    document.getElementById('loc-city').textContent = city;
-    document.getElementById('loc-region').textContent = `${region}, ${d.country_name || ''}`;
-    addLog(`📍 Location pinpointed: ${city}, ${region}`,'#ff0000');
-
-    await new Promise(r=>setTimeout(r,200));
-    addLog('Data capture complete.','#ff4444');
-    addLog('😂 jk this is just a prank bro','#00ff41');
-  } catch(e) {
-    addLog('Could not fetch location. Firewall active?','#ff4444');
-    document.getElementById('loc-city').textContent = 'Unknown';
+async function flush(){
+  running=true;
+  while(queue.length){
+    const item=queue.shift();
+    if(item.type==='p') await runBar(item.label,item.fillMs);
+    else if(item.type==='wait') await item.p;
+    else{if(item.delay)await sleep(item.delay);await typeLine(item.t,item.cls)}
   }
+  running=false;
 }
 
-function endPrank(){
-  document.getElementById('snd').pause();
-  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#00ff41;font-family:monospace;font-size:1.5rem;text-align:center">😂<br>GOT YOU!<br><span style="font-size:1rem;opacity:0.6;margin-top:10px;display:block">Refresh to reset</span></div>';
+function typeLine(text,cls){
+  return new Promise(res=>{
+    const div=document.createElement('div');div.className='log-line '+cls;logEl.appendChild(div);
+    let i=0;const cur=document.createElement('span');cur.className='cursor';div.appendChild(cur);
+    const speed=text.length>60?7:20;
+    const iv=setInterval(()=>{cur.remove();div.textContent=text.slice(0,++i);div.appendChild(cur);
+      if(i>=text.length){clearInterval(iv);cur.remove();res()}},speed);
+  });
 }
 
-init();
-</script>
-<audio id="prank-snd" preload="auto"><source src="sound.mp3" type="audio/mpeg"></audio>
-<script>
-  // Play sound as soon as user interacts or page loads
-  var snd = document.getElementById('prank-snd');
-  snd.volume = 0.9;
-  var played = false;
-  function tryPlay(){ if(!played){ snd.play().then(()=>played=true).catch(()=>{}); } }
-  document.addEventListener('click', tryPlay);
-  document.addEventListener('touchstart', tryPlay);
-  window.addEventListener('load', ()=>setTimeout(tryPlay, 500));
+function runBar(label,fillMs){
+  return new Promise(res=>{
+    const wrap=document.createElement('div');wrap.className='progress-bar';
+    const track=document.createElement('div');track.className='bar-track';
+    const fill=document.createElement('div');fill.className='bar-fill';
+    const pct=document.createElement('div');pct.className='bar-pct';
+    const lbl=document.createElement('div');lbl.className='log-line dim';
+    track.appendChild(fill);wrap.appendChild(lbl);wrap.appendChild(track);wrap.appendChild(pct);
+    lbl.textContent=label;logEl.appendChild(wrap);
+    let p=0;const step=100/(fillMs/30);
+    const iv=setInterval(()=>{p=Math.min(p+step*(.5+Math.random()),100);fill.style.width=p+'%';pct.textContent=Math.floor(p)+'%';
+      if(p>=100){clearInterval(iv);res()}},30);
+  });
+}
+
+new MutationObserver(()=>window.scrollTo(0,document.body.scrollHeight)).observe(logEl,{childList:true,subtree:true});
+function setField(id,val){const el=$(id);if(!el)return;el.textContent=val;el.classList.remove('glow');void el.offsetWidth;el.classList.add('glow')}
+
+function getOS(){
+  const ua=navigator.userAgent;
+  if(/android/i.test(ua)){const m=ua.match(/Android\s([\d.]+)/);return'Android '+(m?m[1]:'')}
+  if(/iphone|ipad/i.test(ua)){const m=ua.match(/OS\s([\d_]+)/);return'iOS '+(m?m[1].replace(/_/g,'.'):'')}
+  if(/windows/i.test(ua))return'Windows';
+  if(/mac/i.test(ua))return'macOS';
+  return'Unknown OS';
+}
+function getBrowser(){
+  const ua=navigator.userAgent;
+  if(/SamsungBrowser\/([\d.]+)/.test(ua))return'Samsung Internet '+RegExp.$1;
+  if(/Chrome\/([\d.]+)/.test(ua)&&!/Edg/.test(ua))return'Chrome '+RegExp.$1;
+  if(/Firefox\/([\d.]+)/.test(ua))return'Firefox '+RegExp.$1;
+  if(/Edg\/([\d.]+)/.test(ua))return'Edge '+RegExp.$1;
+  return'Safari/Unknown';
+}
+
+// Get best possible location — tries high accuracy first, falls back to low
+function getLocation(){
+  return new Promise(res=>{
+    // Try high accuracy (real GPS)
+    navigator.geolocation.getCurrentPosition(
+      pos=>res({pos,denied:false}),
+      ()=>{
+        // High accuracy failed — try again with low accuracy (network/cell)
+        navigator.geolocation.getCurrentPosition(
+          pos=>res({pos,denied:false}),
+          ()=>res({pos:null,denied:true}),
+          {enableHighAccuracy:false,timeout:10000,maximumAge:30000}
+        );
+      },
+      {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+    );
+  });
+}
+
+(async()=>{
+  const realOS=getOS();
+  const realBrowser=getBrowser();
+
+  addLine('> INITIALIZING CONNECTION...','dim',300);
+  addLine(`> NODE HANDSHAKE: ${hex(8).toUpperCase()}.${hex(4).toUpperCase()}`,'dim');
+  addLine('> ENCRYPTING CHANNEL  [AES-256-GCM]','dim');
+  addLine('> BYPASSING FIREWALL...','dim');
+  addProgress('  FIREWALL BYPASS ',1400);
+  await sleep(200);
+  addLine('> FIREWALL BYPASSED ✓','');
+  addLine(`> TARGET IP DETECTED: ${FAKE.ip}`,'bright');
+  addLine('> PROBING DEVICE FINGERPRINT...','dim');
+  addProgress('  DEVICE SCAN     ',1400);
+  addLine(`> DEVICE: ${FAKE.device}`,'bright');
+  addLine(`> OS: ${realOS}  |  BROWSER: ${realBrowser}`,'');
+  addLine('> INJECTING LOCATION PROBE...','warn');
+  addLine('> WARNING: GPS TRIANGULATION ACTIVE','warn');
+
+  // Start location request NOW — popup appears here
+  const locPromise = getLocation();
+
+  // Show waiting box
+  await sleep(100);
+  $('waiting').style.display='block';
+  window.scrollTo(0,document.body.scrollHeight);
+
+  // Wait for user to tap Allow/Deny
+  const {pos,denied} = await locPromise;
+  $('waiting').style.display='none';
+
+  let lat,lng,acc,alt;
+
+  if(!denied && pos){
+    lat=pos.coords.latitude;
+    lng=pos.coords.longitude;
+    acc=Math.round(pos.coords.accuracy);
+    alt=pos.coords.altitude!=null?pos.coords.altitude.toFixed(1)+' m':'N/A';
+    addLine('> GPS SATELLITE LOCK ACQUIRED ✓','bright');
+  } else {
+    // truly denied — use fake fallback
+    lat=14.1120+(Math.random()-.5)*.02;
+    lng=122.9556+(Math.random()-.5)*.02;
+    acc=rnd(800,1800);
+    alt='N/A';
+    addLine('> ACCESS DENIED — CELL TOWER FALLBACK','red');
+  }
+
+  addProgress('  GPS LOCK        ',900);
+  addLine(`> LAT: ${lat.toFixed(6)}   LNG: ${lng.toFixed(6)}`,'bright');
+  addLine(`> ACCURACY: ±${acc} meters`,'');
+  addLine('','');
+  addLine('> COMPILING FULL REPORT...','warn',200);
+  addProgress('  COMPILE         ',600);
+
+  $('resultBox').classList.add('show');
+  setField('r-ip',     FAKE.ip);
+  setField('r-isp',    FAKE.isp);
+  setField('r-device', FAKE.device);
+  setField('r-os',     realOS);
+  setField('r-browser',realBrowser);
+  setField('r-battery','...');
+  setField('r-lat',    lat.toFixed(6));
+  setField('r-lng',    lng.toFixed(6));
+  setField('r-acc',    '±'+acc+' meters');
+  setField('r-alt',    alt);
+
+  $('mapCoords').textContent=`${lat.toFixed(4)} / ${lng.toFixed(4)}`;
+  $('gmapsBtn').href=`https://www.google.com/maps?q=${lat},${lng}`;
+
+  await sleep(600);
+  $('alertBanner').classList.add('show');
+  window.scrollTo(0,document.body.scrollHeight);
+
+  if('getBattery' in navigator){
+    navigator.getBattery().then(b=>{
+      setField('r-battery',Math.round(b.level*100)+'% — '+(b.charging?'charging':'not charging'));
+    });
+  } else {
+    setField('r-battery',rnd(20,95)+'% — '+(Math.random()>.5?'charging':'not charging'));
+  }
+})();
 </script>
 </body>
 </html>
