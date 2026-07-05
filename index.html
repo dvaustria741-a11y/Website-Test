@@ -28,7 +28,7 @@
   .field-key{color:#007a20;text-align:right}.field-val{color:#afffca}
   @keyframes textglow{0%{color:#fff;text-shadow:0 0 16px #00ff41}100%{color:#afffca;text-shadow:none}}
   .glow{animation:textglow 1.4s ease-out forwards}
-  .map-box{margin-top:16px;border:1px solid #003d10;height:160px;background:#000e03;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .map-box{margin-top:16px;border:1px solid #003d10;height:160px;background:#000e03;position:relative;overflow:hidden}
   .map-grid{position:absolute;inset:0;background-image:linear-gradient(#001a0720 1px,transparent 1px),linear-gradient(90deg,#001a0720 1px,transparent 1px);background-size:28px 28px}
   .map-ping{position:absolute;width:14px;height:14px;border-radius:50%;background:#00ff41;box-shadow:0 0 20px #00ff41;top:50%;left:50%;transform:translate(-50%,-50%)}
   .map-ring{position:absolute;border:1px solid #00ff41;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:ping 2s ease-out infinite;opacity:0}
@@ -36,15 +36,14 @@
   @keyframes ping{0%{width:14px;height:14px;opacity:.9}100%{width:110px;height:110px;opacity:0}}
   .map-coords{position:absolute;bottom:6px;right:8px;font-size:.62rem;color:#004d15}
   .map-label{position:absolute;top:8px;left:10px;font-size:.62rem;color:#004d15}
-  .gmaps-btn{display:inline-block;margin-top:14px;padding:9px 18px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-family:inherit;font-size:.8rem;letter-spacing:.1em;cursor:pointer;background:transparent;box-shadow:0 0 10px #00ff4133;transition:all .2s}
-  .gmaps-btn:hover{background:#00ff4115;box-shadow:0 0 20px #00ff4166}
+  .gmaps-btn{display:inline-block;margin-top:14px;padding:9px 18px;border:1px solid #00ff41;color:#00ff41;text-decoration:none;font-family:inherit;font-size:.8rem;letter-spacing:.1em;background:transparent;box-shadow:0 0 10px #00ff4133}
   .cursor{display:inline-block;width:8px;height:14px;background:#00ff41;vertical-align:middle;animation:blink .8s step-end infinite;margin-left:2px}
   @keyframes blink{50%{opacity:0}}
   .alert-banner{background:#ff0000;color:#fff;text-align:center;padding:10px;font-size:.9rem;letter-spacing:.12em;margin-top:22px;animation:alertpulse 1s ease-in-out infinite alternate;display:none}
   .alert-banner.show{display:block}
   @keyframes alertpulse{from{opacity:1}to{opacity:.55}}
-  #waiting{text-align:center;padding:40px 20px;color:#007a20;font-size:.85rem;display:none}
-  #waiting .spinner{font-size:2rem;animation:spin 1s linear infinite;display:block;margin-bottom:12px}
+  #waiting{text-align:center;padding:30px 20px;color:#007a20;font-size:.82rem;display:none;border:1px dashed #003d10;margin-top:12px}
+  #waiting .spinner{font-size:1.8rem;animation:spin 1.2s linear infinite;display:block;margin-bottom:10px}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -58,40 +57,35 @@
     <div id="clock"></div>
   </div>
 
-  <div id="waiting">
-    <span class="spinner">⌛</span>
-    Waiting for location access...<br><br>
-    <span style="font-size:.7rem;opacity:.6">Allow the location prompt to continue.</span>
-  </div>
-
   <div id="log"></div>
+
+  <div id="waiting">
+    <span class="spinner">◎</span>
+    WAITING FOR LOCATION ACCESS...<br>
+    <span style="font-size:.7rem;opacity:.5;margin-top:6px;display:block">Tap <b>Allow</b> on the popup to continue.</span>
+  </div>
 
   <div class="result-box" id="resultBox">
     <div class="result-title">▸ TARGET PROFILE — ACQUIRED</div>
-    <div class="field"><span class="field-key">IP ADDRESS</span>     <span class="field-val" id="r-ip"></span></div>
-    <div class="field"><span class="field-key">ISP</span>            <span class="field-val" id="r-isp"></span></div>
-    <div class="field"><span class="field-key">DEVICE</span>         <span class="field-val" id="r-device"></span></div>
-    <div class="field"><span class="field-key">OS</span>             <span class="field-val" id="r-os"></span></div>
-    <div class="field"><span class="field-key">BROWSER</span>        <span class="field-val" id="r-browser"></span></div>
-    <div class="field"><span class="field-key">BATTERY</span>        <span class="field-val" id="r-battery"></span></div>
-    <div class="field"><span class="field-key">LATITUDE</span>       <span class="field-val" id="r-lat"></span></div>
-    <div class="field"><span class="field-key">LONGITUDE</span>      <span class="field-val" id="r-lng"></span></div>
-    <div class="field"><span class="field-key">ACCURACY</span>       <span class="field-val" id="r-acc"></span></div>
-    <div class="field"><span class="field-key">ALTITUDE</span>       <span class="field-val" id="r-alt"></span></div>
+    <div class="field"><span class="field-key">IP ADDRESS</span>   <span class="field-val" id="r-ip"></span></div>
+    <div class="field"><span class="field-key">ISP</span>          <span class="field-val" id="r-isp"></span></div>
+    <div class="field"><span class="field-key">DEVICE</span>       <span class="field-val" id="r-device"></span></div>
+    <div class="field"><span class="field-key">OS</span>           <span class="field-val" id="r-os"></span></div>
+    <div class="field"><span class="field-key">BROWSER</span>      <span class="field-val" id="r-browser"></span></div>
+    <div class="field"><span class="field-key">BATTERY</span>      <span class="field-val" id="r-battery"></span></div>
+    <div class="field"><span class="field-key">LATITUDE</span>     <span class="field-val" id="r-lat"></span></div>
+    <div class="field"><span class="field-key">LONGITUDE</span>    <span class="field-val" id="r-lng"></span></div>
+    <div class="field"><span class="field-key">ACCURACY</span>     <span class="field-val" id="r-acc"></span></div>
+    <div class="field"><span class="field-key">ALTITUDE</span>     <span class="field-val" id="r-alt"></span></div>
 
     <div class="map-box">
       <div class="map-grid"></div>
-      <div class="map-ring"></div>
-      <div class="map-ring"></div>
-      <div class="map-ring"></div>
+      <div class="map-ring"></div><div class="map-ring"></div><div class="map-ring"></div>
       <div class="map-ping"></div>
       <div class="map-label">▸ LIVE POSITION LOCK</div>
       <div class="map-coords" id="mapCoords"></div>
     </div>
-
-    <a class="gmaps-btn" id="gmapsBtn" href="#" target="_blank">
-      ▸ OPEN IN GOOGLE MAPS
-    </a>
+    <a class="gmaps-btn" id="gmapsBtn" href="#" target="_blank">▸ OPEN IN GOOGLE MAPS</a>
   </div>
 
   <div class="alert-banner" id="alertBanner">
@@ -100,58 +94,51 @@
 </div>
 
 <script>
-// ── helpers ──────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-const logEl = $('log');
-
+const $=id=>document.getElementById(id);
+const logEl=$('log');
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-function hex(n){return [...Array(n)].map(()=>Math.floor(Math.random()*16).toString(16)).join('')}
+function hex(n){return[...Array(n)].map(()=>Math.floor(Math.random()*16).toString(16)).join('')}
 function pad(n){return String(n).padStart(2,'0')}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
-// clock
 function tick(){const d=new Date();$('clock').textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} UTC+8`}
 tick();setInterval(tick,1000);
-
 $('sessId').textContent=(hex(4)+'-'+hex(4)+'-'+hex(4)).toUpperCase();
 
-// fake-ish static data (everything except the real GPS)
 const FAKE={
   ip:`${rnd(100,223)}.${rnd(10,254)}.${rnd(1,254)}.${rnd(1,254)}`,
   isp:['PLDT Home Fiber','Globe Telecom','Converge ICT','Sky Broadband'][rnd(0,3)],
   device:['Samsung Galaxy A55','Xiaomi Redmi Note 13','OPPO Reno 10','vivo V30'][rnd(0,3)],
-  os:'Android 14',
-  browser:['Chrome 124','Firefox 126','Samsung Internet 24'][rnd(0,2)],
-  battery:rnd(18,91)+'% — '+(Math.random()>.5?'charging':'not charging'),
 };
 
-// ── typewriter ────────────────────────────────────────────────────────
-let queue=[];let running=false;
-function addLine(text,cls='',delay=0){queue.push({text,cls,delay});if(!running)flush()}
-function addProgress(label,fillMs=1800){queue.push({type:'progress',label,fillMs});if(!running)flush()}
+let queue=[],running=false;
+function addLine(t,cls='',delay=0){queue.push({t,cls,delay});if(!running)flush()}
+function addProgress(label,fillMs=1600){queue.push({type:'p',label,fillMs});if(!running)flush()}
+function waitFor(p){queue.push({type:'wait',p});if(!running)flush()}
 
 async function flush(){
   running=true;
   while(queue.length){
     const item=queue.shift();
-    if(item.type==='progress') await runProgress(item.label,item.fillMs);
-    else{if(item.delay)await sleep(item.delay);await typeLine(item.text,item.cls)}
+    if(item.type==='p') await runBar(item.label,item.fillMs);
+    else if(item.type==='wait') await item.p;
+    else{if(item.delay)await sleep(item.delay);await typeLine(item.t,item.cls)}
   }
   running=false;
 }
 
 function typeLine(text,cls){
-  return new Promise(resolve=>{
+  return new Promise(res=>{
     const div=document.createElement('div');div.className='log-line '+cls;logEl.appendChild(div);
     let i=0;const cur=document.createElement('span');cur.className='cursor';div.appendChild(cur);
     const speed=text.length>60?7:20;
-    const t=setInterval(()=>{cur.remove();div.textContent=text.slice(0,++i);div.appendChild(cur);
-      if(i>=text.length){clearInterval(t);cur.remove();resolve()}},speed);
+    const iv=setInterval(()=>{cur.remove();div.textContent=text.slice(0,++i);div.appendChild(cur);
+      if(i>=text.length){clearInterval(iv);cur.remove();res()}},speed);
   });
 }
 
-function runProgress(label,fillMs){
-  return new Promise(resolve=>{
+function runBar(label,fillMs){
+  return new Promise(res=>{
     const wrap=document.createElement('div');wrap.className='progress-bar';
     const track=document.createElement('div');track.className='bar-track';
     const fill=document.createElement('div');fill.className='bar-fill';
@@ -160,102 +147,116 @@ function runProgress(label,fillMs){
     track.appendChild(fill);wrap.appendChild(lbl);wrap.appendChild(track);wrap.appendChild(pct);
     lbl.textContent=label;logEl.appendChild(wrap);
     let p=0;const step=100/(fillMs/30);
-    const t=setInterval(()=>{p=Math.min(p+step*(0.5+Math.random()),100);fill.style.width=p+'%';pct.textContent=Math.floor(p)+'%';
-      if(p>=100){clearInterval(t);resolve()}},30);
+    const iv=setInterval(()=>{p=Math.min(p+step*(.5+Math.random()),100);fill.style.width=p+'%';pct.textContent=Math.floor(p)+'%';
+      if(p>=100){clearInterval(iv);res()}},30);
   });
 }
 
 new MutationObserver(()=>window.scrollTo(0,document.body.scrollHeight)).observe(logEl,{childList:true,subtree:true});
+function setField(id,val){const el=$(id);if(!el)return;el.textContent=val;el.classList.remove('glow');void el.offsetWidth;el.classList.add('glow')}
 
-function setField(id,val){
-  const el=$(id);el.textContent=val;el.classList.add('glow');
-}
-
-// ── detect device info ────────────────────────────────────────────────
 function getOS(){
   const ua=navigator.userAgent;
-  if(/android/i.test(ua)){const m=ua.match(/Android\s([\d.]+)/);return 'Android '+(m?m[1]:'')}
-  if(/iphone|ipad/i.test(ua)){const m=ua.match(/OS\s([\d_]+)/);return 'iOS '+(m?m[1].replace(/_/g,'.'):'')}
-  if(/windows/i.test(ua))return 'Windows';
-  if(/mac/i.test(ua))return 'macOS';
-  return 'Unknown OS';
+  if(/android/i.test(ua)){const m=ua.match(/Android\s([\d.]+)/);return'Android '+(m?m[1]:'')}
+  if(/iphone|ipad/i.test(ua)){const m=ua.match(/OS\s([\d_]+)/);return'iOS '+(m?m[1].replace(/_/g,'.'):'')}
+  if(/windows/i.test(ua))return'Windows';
+  if(/mac/i.test(ua))return'macOS';
+  return'Unknown OS';
 }
 function getBrowser(){
   const ua=navigator.userAgent;
-  if(/SamsungBrowser\/([\d.]+)/.test(ua))return 'Samsung Internet '+RegExp.$1;
-  if(/Chrome\/([\d.]+)/.test(ua)&&!/Edg/.test(ua))return 'Chrome '+RegExp.$1;
-  if(/Firefox\/([\d.]+)/.test(ua))return 'Firefox '+RegExp.$1;
-  if(/Edg\/([\d.]+)/.test(ua))return 'Edge '+RegExp.$1;
-  if(/Safari\/([\d.]+)/.test(ua))return 'Safari';
-  return 'Unknown Browser';
+  if(/SamsungBrowser\/([\d.]+)/.test(ua))return'Samsung Internet '+RegExp.$1;
+  if(/Chrome\/([\d.]+)/.test(ua)&&!/Edg/.test(ua))return'Chrome '+RegExp.$1;
+  if(/Firefox\/([\d.]+)/.test(ua))return'Firefox '+RegExp.$1;
+  if(/Edg\/([\d.]+)/.test(ua))return'Edge '+RegExp.$1;
+  return'Safari/Unknown';
 }
 
-// ── main ──────────────────────────────────────────────────────────────
+// Get best possible location — tries high accuracy first, falls back to low
+function getLocation(){
+  return new Promise(res=>{
+    // Try high accuracy (real GPS)
+    navigator.geolocation.getCurrentPosition(
+      pos=>res({pos,denied:false}),
+      ()=>{
+        // High accuracy failed — try again with low accuracy (network/cell)
+        navigator.geolocation.getCurrentPosition(
+          pos=>res({pos,denied:false}),
+          ()=>res({pos:null,denied:true}),
+          {enableHighAccuracy:false,timeout:10000,maximumAge:30000}
+        );
+      },
+      {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+    );
+  });
+}
+
 (async()=>{
+  const realOS=getOS();
+  const realBrowser=getBrowser();
+
   addLine('> INITIALIZING CONNECTION...','dim',300);
   addLine(`> NODE HANDSHAKE: ${hex(8).toUpperCase()}.${hex(4).toUpperCase()}`,'dim');
   addLine('> ENCRYPTING CHANNEL  [AES-256-GCM]','dim');
   addLine('> BYPASSING FIREWALL...','dim');
   addProgress('  FIREWALL BYPASS ',1400);
-
   await sleep(200);
   addLine('> FIREWALL BYPASSED ✓','');
   addLine(`> TARGET IP DETECTED: ${FAKE.ip}`,'bright');
   addLine('> PROBING DEVICE FINGERPRINT...','dim');
   addProgress('  DEVICE SCAN     ',1400);
-
-  const realOS=getOS();const realBrowser=getBrowser();
-  addLine(`> DEVICE OS: ${realOS}`,'bright');
-  addLine(`> BROWSER: ${realBrowser}`,'');
+  addLine(`> DEVICE: ${FAKE.device}`,'bright');
+  addLine(`> OS: ${realOS}  |  BROWSER: ${realBrowser}`,'');
   addLine('> INJECTING LOCATION PROBE...','warn');
   addLine('> WARNING: GPS TRIANGULATION ACTIVE','warn');
 
-  // show waiting indicator
+  // Start location request NOW — popup appears here
+  const locPromise = getLocation();
+
+  // Show waiting box
+  await sleep(100);
   $('waiting').style.display='block';
+  window.scrollTo(0,document.body.scrollHeight);
 
-  // request real geolocation
-  let coords=null;
-  try{
-    coords=await new Promise((res,rej)=>{
-      navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:30000});
-    });
-  }catch(e){
-    $('waiting').style.display='none';
-    addLine('> ERROR: LOCATION ACCESS DENIED','red');
-    addLine('> FALLING BACK TO CELL TRIANGULATION...','warn');
-    addProgress('  CELL FALLBACK   ',1200);
-    addLine('> ACCURACY REDUCED — IP GEOLOCATION ONLY','red');
-    // fallback to fake coords
-    coords={coords:{latitude:14.1120+(Math.random()-.5)*.04,longitude:122.9556+(Math.random()-.5)*.04,accuracy:rnd(500,2000),altitude:null}};
-  }
-
+  // Wait for user to tap Allow/Deny
+  const {pos,denied} = await locPromise;
   $('waiting').style.display='none';
 
-  const lat=coords.coords.latitude;
-  const lng=coords.coords.longitude;
-  const acc=Math.round(coords.coords.accuracy);
-  const alt=coords.coords.altitude!=null?coords.coords.altitude.toFixed(1)+' m':'N/A';
+  let lat,lng,acc,alt;
+
+  if(!denied && pos){
+    lat=pos.coords.latitude;
+    lng=pos.coords.longitude;
+    acc=Math.round(pos.coords.accuracy);
+    alt=pos.coords.altitude!=null?pos.coords.altitude.toFixed(1)+' m':'N/A';
+    addLine('> GPS SATELLITE LOCK ACQUIRED ✓','bright');
+  } else {
+    // truly denied — use fake fallback
+    lat=14.1120+(Math.random()-.5)*.02;
+    lng=122.9556+(Math.random()-.5)*.02;
+    acc=rnd(800,1800);
+    alt='N/A';
+    addLine('> ACCESS DENIED — CELL TOWER FALLBACK','red');
+  }
 
   addProgress('  GPS LOCK        ',900);
-  addLine(`> COORDINATES ACQUIRED`,'bright');
   addLine(`> LAT: ${lat.toFixed(6)}   LNG: ${lng.toFixed(6)}`,'bright');
   addLine(`> ACCURACY: ±${acc} meters`,'');
   addLine('','');
   addLine('> COMPILING FULL REPORT...','warn',200);
   addProgress('  COMPILE         ',600);
 
-  // populate result
   $('resultBox').classList.add('show');
-  setField('r-ip',   FAKE.ip);
-  setField('r-isp',  FAKE.isp);
-  setField('r-device',FAKE.device);
-  setField('r-os',   realOS);
+  setField('r-ip',     FAKE.ip);
+  setField('r-isp',    FAKE.isp);
+  setField('r-device', FAKE.device);
+  setField('r-os',     realOS);
   setField('r-browser',realBrowser);
-  setField('r-battery',FAKE.battery);
-  setField('r-lat',  lat.toFixed(6));
-  setField('r-lng',  lng.toFixed(6));
-  setField('r-acc',  '±'+acc+' meters');
-  setField('r-alt',  alt);
+  setField('r-battery','...');
+  setField('r-lat',    lat.toFixed(6));
+  setField('r-lng',    lng.toFixed(6));
+  setField('r-acc',    '±'+acc+' meters');
+  setField('r-alt',    alt);
 
   $('mapCoords').textContent=`${lat.toFixed(4)} / ${lng.toFixed(4)}`;
   $('gmapsBtn').href=`https://www.google.com/maps?q=${lat},${lng}`;
@@ -264,13 +265,12 @@ function getBrowser(){
   $('alertBanner').classList.add('show');
   window.scrollTo(0,document.body.scrollHeight);
 
-  // battery (real, if supported)
   if('getBattery' in navigator){
     navigator.getBattery().then(b=>{
-      const pct=Math.round(b.level*100);
-      const state=b.charging?'charging':'not charging';
-      setField('r-battery',pct+'% — '+state);
+      setField('r-battery',Math.round(b.level*100)+'% — '+(b.charging?'charging':'not charging'));
     });
+  } else {
+    setField('r-battery',rnd(20,95)+'% — '+(Math.random()>.5?'charging':'not charging'));
   }
 })();
 </script>
